@@ -3,26 +3,28 @@
 import sys
 import os
 import pandas as pd
+from model.farm_model import (Animal, Group, Expense, Schedule, Supply)
 
 class Exporter:
     def __init__(self):
-        settings_df = pd.read_csv("data/settings.csv")
-        my_df = pd.read_csv("data/group_db.csv")
+        self.settings_df = pd.read_csv("data/settings.csv")
+        self.my_df = pd.read_csv("data/group_db.csv")
 
-    def add_record(object):
-        if object is Animal:
+    def add_record(self, object):
+        if type(object) is Animal:
             #append object to Animal file
-            my_df.to_csv("data/group_db.csv")
-        elif object is Group:
+            self.my_df.to_csv("data/group_db.csv")
+            print(object)
+        elif type(object) is Group:
             #append object to Group
             pass
-        elif object is Expense:
+        elif type(object) is Expense:
             #append to Expense
             pass
-        elif object is Schedule:
+        elif type(object) is Schedule:
             #append Schedule
             pass
-        elif object is Supply:
+        elif type(object) is Supply:
             #append Supply
             pass
         else:
