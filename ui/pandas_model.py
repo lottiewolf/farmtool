@@ -1,10 +1,8 @@
 # This Python file uses the following encoding: utf-8
 
-# if __name__ == "__main__":
-#     pass
-
-import pandas as pd
 from PySide6.QtCore import (QAbstractTableModel, Qt, QModelIndex)
+import pandas as pd
+
 
 class PandasModel(QAbstractTableModel):
     """A model to interface a Qt view with pandas dataframe """

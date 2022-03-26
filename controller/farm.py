@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from db.farm_db import FarmDB
+from model.farm_db import FarmDB
 import os, os.path
 import pandas as pd
 

@@ -3,9 +3,8 @@
 from PySide6.QtWidgets import (QWidget, QFormLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget)
 from PySide6.QtWidgets import (QGroupBox, QTableView, )
 from PySide6.QtCore import (Qt, QRect, QDateTime)
-from model.data_model import PandasModel
-from ui.Config import Config
-from model.farm_model import Farm
+from ui.pandas_model import PandasModel
+from controller.farm import Farm
 import pandas as pd
 
 class SupplyWidget(QWidget):

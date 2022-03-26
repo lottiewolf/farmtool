@@ -3,7 +3,7 @@
 import sys
 import os
 import pandas as pd
-from model.farm_model import (Animal, Group, Expense, Schedule, Supply)
+from controller.farm import (Animal, Group, Expense, Schedule, Supply)
 
 class Exporter:
     def __init__(self):
@@ -30,3 +30,19 @@ class Exporter:
         else:
             raise Exception("Unknown object. Record not added to database")
 
+
+#        self.folder_path = os.path.join(os.getcwd(), "data")
+#        self.settings_file = os.path.join(self.folder_path, "__settings.xml")
+# Create Groups file
+# df = pd.DataFrame([], columns=['name'])
+# df.to_csv(self.group_file)
+
+# Loads 5 tables
+# try:
+#    self.groups_df=pd.read_csv(self.group_file)
+#    self.supplies_df=pd.read_csv(self.supply_file)
+#    self.animal_df=pd.read_csv(self.animal_file)
+#    self.expense_df=pd.read_csv(self.expense_file)
+#    self.schedule_df=pd.read_csv(self.schedule_file)
+# except:
+#    raise Exception("File error: Not able to read group, supply, animal, expense, or schedule file(s)")

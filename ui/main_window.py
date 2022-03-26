@@ -1,17 +1,17 @@
 # This Python file uses the following encoding: utf-8
 
-import sys
 from PySide6.QtWidgets import (QMainWindow, QVBoxLayout, QTabWidget)
 from PySide6.QtCore import Qt
-from config.ConfigFarm import ConfigFarm
-from ui.MainMenu import MainMenu
-from ui.GroupWidget import GroupWidget
-from ui.AnimalWidget import AnimalWidget
-from ui.ScheduleWidget import ScheduleWidget
-from ui.SupplyWidget import SupplyWidget
-from ui.ExpenseWidget import ExpenseWidget
-from ui.HelpWidget import HelpWidget
-from ui.CreateFarmDialog import CreateFarmDialog
+from config.config_farm import ConfigFarm
+from ui.main_menu import MainMenu
+from ui.group_widget import GroupWidget
+from ui.animal_widget import AnimalWidget
+from ui.schedule_widget import ScheduleWidget
+from ui.supply_widget import SupplyWidget
+from ui.expense_widget import ExpenseWidget
+from ui.help_widget import HelpWidget
+from ui.create_farm_dialog import CreateFarmDialog
+import sys
 
 
 class MainWindow(QMainWindow):

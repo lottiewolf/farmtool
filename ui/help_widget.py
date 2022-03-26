@@ -2,7 +2,6 @@
 
 from PySide6.QtWidgets import (QDockWidget, QListWidget)
 from PySide6.QtCore import Qt
-from ui.Config import Config
 
 class HelpWidget(QDockWidget):
     def __init__(self, main_window):

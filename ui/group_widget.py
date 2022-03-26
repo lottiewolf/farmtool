@@ -2,8 +2,8 @@
 
 from PySide6.QtWidgets import (QWidget, QFormLayout, QTableView, QLabel, QLineEdit, QPushButton)
 from PySide6.QtCore import QRect
-from model.data_model import PandasModel
-from model.farm_model import Farm
+from ui.pandas_model import PandasModel
+from controller.farm import Farm
 import pandas as pd
 
 class GroupWidget(QWidget):
