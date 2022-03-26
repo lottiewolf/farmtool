@@ -8,8 +8,8 @@ from ui.MainWindow import MainWindow
 if __name__ == "__main__":
     app = QApplication([])
 
-    farm_config = ConfigFarm.instance()
-    farm_config.load()
+    settings = ConfigFarm.instance()
+    settings.load()
 
     window = MainWindow()
     window.show()
