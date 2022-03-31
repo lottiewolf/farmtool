@@ -92,8 +92,8 @@ class FarmDB():
             session.add(an)
         return self.get_animals()
 
-    def add_expense(self, new_name, new_cost, new_group, new_animal, new_supply):
-        exs = Supply(name=new_name, cost=new_cost, group=new_group, animal=new_animal, supply=new_supply)
+    def add_expense(self, name, cost, group, animal, date):
+        exs = Expense(name=name, amount=cost, group=group, animal=animal, date=date)
         with self.Session.begin() as session:
             session.add(exs)
         return self.get_expenses()

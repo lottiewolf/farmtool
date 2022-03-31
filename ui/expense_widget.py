@@ -1,11 +1,22 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget, QDoubleSpinBox)
-from PySide6.QtWidgets import (QGroupBox, QTableView, QFormLayout)
-from PySide6.QtCore import (Qt, QRect, QDateTime)
+from PySide6.QtWidgets import (
+    QWidget,
+    QFormLayout,
+    QTableView,
+    QLineEdit,
+    QDoubleSpinBox,
+    QComboBox,
+    QDateEdit,
+    QLabel,
+    QPushButton,
+)
+from PySide6.QtCore import (QRect, QDateTime)
 from model.pandas_model import PandasModel
+from model.list_model import ListModel
 from controller.farm import Farm
 import pandas as pd
+
 
 class ExpenseWidget(QWidget):
     def __init__(self):
@@ -20,14 +31,18 @@ class ExpenseWidget(QWidget):
         self.farmview.setSelectionBehavior(QTableView.SelectRows)
         self.layout.addRow(self.farmview)
 
-        self.ex_name = QLineEdit()
-        self.ex_cost = QDoubleSpinBox()
-        self.ex_group = QLineEdit()
-        self.ex_animal = QLineEdit()
-        self.layout.addRow(QLabel("Name of Expense"), self.ex_name)
-        self.layout.addRow(QLabel("Cost"), self.ex_cost)
-        self.layout.addRow(QLabel("Group"), self.ex_group)
-        self.layout.addRow(QLabel("Animal"), self.ex_animal)
+        self.name = QLineEdit()
+        self.cost = QDoubleSpinBox()
+        self.groups = QComboBox()
+        self.animals = QComboBox()
+        self.date_added = QDateEdit(calendarPopup=True)
+        self.date_added.setDateTime(QDateTime.currentDateTime())
+
+        self.layout.addRow(QLabel("Name of Expense"), self.name)
+        self.layout.addRow(QLabel("Cost"), self.cost)
+        self.layout.addRow(QLabel("Group"), self.groups)
+        self.layout.addRow(QLabel("Animal"), self.animals)
+        self.layout.addRow(QLabel("Date Added"), self.date_added)
         self.gp_button = QPushButton("Add")
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
         self.layout.addRow(self.gp_button)
@@ -45,17 +60,27 @@ class ExpenseWidget(QWidget):
 
         model = PandasModel(self.expenses)
         self.farmview.setModel(model)
+        self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.animals.setModel(ListModel(Farm.instance().get_animals()))
 
     def add_expense(self):
+        g_i = self.groups.currentIndex()
+        a_i = self.animals.currentIndex()
         try:
-            self.expenses = Farm.instance().add_expense(self.ex_name.text(), self.ex_cost.value(), self.ex_group.text(), self.ex_animal.text())
+            self.expenses = Farm.instance().add_expense(
+                self.name.text(),
+                self.cost.value(),
+                self.groups.model().currentObj(g_i),
+                self.animals.model().currentObj(a_i),
+                self.date_added.date().toPython(),
+            )
         except:
             raise Exception("Could not modify expenses.")
 
-        self.ex_name.setText("")
-        self.ex_cost.setText("")
-        self.ex_group.setText("")
-        self.ex_animal.setText("")
-        self.ex_supply.setText("")
+        self.name.setText("")
+        self.cost.setValue(0.0)
+        self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.date_added.setDateTime(QDateTime.currentDateTime())
         model = PandasModel(self.expenses)
         self.farmview.setModel(model)

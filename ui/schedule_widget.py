@@ -1,11 +1,22 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QGroupBox, QTableView, QFormLayout)
-from PySide6.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget)
-from PySide6.QtCore import (Qt, QRect, QDateTime)
+from PySide6.QtWidgets import (
+    QWidget,
+    QFormLayout,
+    QTableView,
+    QLineEdit,
+    QComboBox,
+    QDoubleSpinBox,
+    QDateEdit,
+    QLabel,
+    QPushButton,
+)
+from PySide6.QtCore import (QRect, QDateTime)
 from model.pandas_model import PandasModel
+from model.list_model import ListModel
 from controller.farm import Farm
 import pandas as pd
+
 
 class ScheduleWidget(QWidget):
     def __init__(self):
@@ -20,17 +31,18 @@ class ScheduleWidget(QWidget):
         self.farmview.setSelectionBehavior(QTableView.SelectRows)
         self.layout.addRow(self.farmview)
 
-        self.sched_name = QLineEdit()
-        self.sched_anim = QLineEdit()
-        self.sched_supply = QLineEdit()
-        self.sched_qty = QLineEdit()
-        self.sched_date_start = QDateEdit(calendarPopup=True)
-        self.sched_date_start.setDateTime(QDateTime.currentDateTime())
-        self.layout.addRow(QLabel("Schedule Name"), self.sched_name)
-        self.layout.addRow(QLabel("Animal Name"), self.sched_anim)
-        self.layout.addRow(QLabel("Supply"), self.sched_supply)
-        self.layout.addRow(QLabel("Quantity"), self.sched_qty)
-        self.layout.addRow(QLabel("Date Started"), self.sched_date_start)
+        self.name = QLineEdit()
+        self.animals = QComboBox()
+        self.supplies = QComboBox()
+        self.qty = QDoubleSpinBox()
+        self.date_start = QDateEdit(calendarPopup=True)
+        self.date_start.setDateTime(QDateTime.currentDateTime())
+
+        self.layout.addRow(QLabel("Schedule Name"), self.name)
+        self.layout.addRow(QLabel("Animal"), self.animals)
+        self.layout.addRow(QLabel("Supply"), self.supplies)
+        self.layout.addRow(QLabel("Quantity"), self.qty)
+        self.layout.addRow(QLabel("Date Started"), self.date_start)
         self.gp_button = QPushButton("Add")
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
         self.layout.addRow(self.gp_button)
@@ -48,17 +60,27 @@ class ScheduleWidget(QWidget):
 
         model = PandasModel(self.schedules)
         self.farmview.setModel(model)
+        self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
 
     def add_sched(self):
+        a_i = self.animals.currentIndex()
+        s_i = self.supplies.currentIndex()
         try:
-            self.schedules = Farm.instance().add_schedule(self.sched_name.text(), self.sched_anim.text(), self.sched_supply.text(), self.sched_qty.text(), self.sched_date_start.date())
+            self.schedules = Farm.instance().add_schedule(
+                self.name.text(),
+                self.animals.model().currentObj(a_i),
+                self.supplies.model().currentObj(s_i),
+                self.qty.value(),
+                self.date_start.date().toPython(),
+            )
         except:
             raise Exception("Could not modify schedules.")
 
-        self.sched_name.setText("")
-        self.sched_anim.setText("")
-        self.sched_supply.setText("")
-        self.sched_qty.setText("")
-        self.sched_date_start.setDateTime(QDateTime.currentDateTime())
+        self.name.setText("")
+        self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
+        self.qty.setValue(0.0)
+        self.date_start.setDateTime(QDateTime.currentDateTime())
         model = PandasModel(self.schedules)
         self.farmview.setModel(model)

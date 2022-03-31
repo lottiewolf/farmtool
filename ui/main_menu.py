@@ -1,6 +1,13 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QMenuBar, QVBoxLayout, QLabel, QFormLayout, QTableView, QMessageBox)
+from PySide6.QtWidgets import (
+    QMenuBar,
+    QVBoxLayout,
+    QLabel,
+    QFormLayout,
+    QTableView,
+    QMessageBox
+)
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
 from ui.group_widget import GroupWidget

@@ -2,6 +2,7 @@
 
 from PySide6.QtWidgets import QInputDialog
 
+
 class CreateFarmDialog(QInputDialog):
     def __init__(self):
         super().__init__()
@@ -11,5 +12,4 @@ class CreateFarmDialog(QInputDialog):
         self.setOkButtonText("Create Farm")
         self.setLabelText("Please enter the name of your farm: ")
         self.setTextValue("write farm name here")
-
 

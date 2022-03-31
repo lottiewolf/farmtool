@@ -74,8 +74,8 @@ class Farm:
         self.animals = self.db.add_animal(name, group, date_add, date_rm)
         return self.animals
 
-    def add_expense(self, name, cost, group, animal, supply):
-        self.expenses = self.db.add_expense(name, cost, group, animal, supply)
+    def add_expense(self, name, cost, group, animal, date):
+        self.expenses = self.db.add_expense(name, cost, group, animal, date)
         return self.expenses
 
     def add_schedule(self, name, animal, supply, qty, day_time):

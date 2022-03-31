@@ -1,6 +1,13 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QWidget, QFormLayout, QTableView, QLabel, QLineEdit, QPushButton)
+from PySide6.QtWidgets import (
+    QWidget,
+    QFormLayout,
+    QTableView,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+)
 from PySide6.QtCore import QRect
 from model.pandas_model import PandasModel
 from controller.farm import Farm

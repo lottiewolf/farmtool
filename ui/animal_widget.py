@@ -8,9 +8,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDateEdit,
     QPushButton,
-    QCalendarWidget,
     QTableView,
-    QGroupBox,
 )
 from PySide6.QtCore import (QRect, QDateTime)
 from model.pandas_model import PandasModel
@@ -32,14 +30,13 @@ class AnimalWidget(QWidget):
         self.farmview.setSelectionBehavior(QTableView.SelectRows)
         self.layout.addRow(self.farmview)
 
-        self.anim_name = QLineEdit()
-        self.groups_list = QComboBox()
-        self.groups_list.setModel(ListModel(Farm.instance().get_groups()))
+        self.name = QLineEdit()
+        self.groups = QComboBox()
         self.date_added = QDateEdit(calendarPopup=True)
         self.date_added.setDateTime(QDateTime.currentDateTime())
 
-        self.layout.addRow(QLabel("Animal Name"), self.anim_name)
-        self.layout.addRow(QLabel("Group Name"), self.groups_list)
+        self.layout.addRow(QLabel("Animal Name"), self.name)
+        self.layout.addRow(QLabel("Group Name"), self.groups)
         self.layout.addRow(QLabel("Date Added"), self.date_added)
         self.gp_button = QPushButton("Add")
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
@@ -58,22 +55,22 @@ class AnimalWidget(QWidget):
 
         model = PandasModel(self.animals)
         self.farmview.setModel(model)
+        self.groups.setModel(ListModel(Farm.instance().get_groups()))
 
     def add_anim(self):
-        j = self.groups_list.currentIndex()
+        i = self.groups.currentIndex()
         try:
             self.animals = Farm.instance().add_animal(
-                self.anim_name.text(),
-                self.groups_list.model().currentObj(j),
+                self.name.text(),
+                self.groups.model().currentObj(i),
                 self.date_added.date().toPython(),
                 self.date_added.date().toPython(),
             )
         except:
             raise Exception("Could not modify animals.")
 
-        self.anim_name.setText("")
-        self.groups_list.clear()
-        self.groups_list.addItems(Farm.instance().get_group_list())
+        self.name.setText("")
+        self.groups.setModel(ListModel(Farm.instance().get_groups()))
         self.date_added.setDateTime(QDateTime.currentDateTime())
         model = PandasModel(self.animals)
         self.farmview.setModel(model)
