@@ -5,12 +5,11 @@ Created on Tue Feb 22 11:23:05 2022
 
 @author: cwolf
 """
-import sqlalchemy
-import re
-from sqlalchemy import create_engine
+
+from sqlalchemy import (create_engine, select)
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy import (Sequence, Column, Integer, ForeignKey, String, DateTime, Date, Float)
-import os, os.path
+from config.config_farm import ConfigFarm
 import pandas as pd
 
 Base = declarative_base()
@@ -25,148 +24,87 @@ class FarmDB():
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            print("Creating new DB instance")
+            print("Connecting to database...")
             cls._instance = cls.__new__(cls)
             cls._instance.new_instance()
         return cls._instance
 
     def new_instance(self):
         try:
-            self.engine = create_engine('sqlite:///db/farmtool.db', echo=True)
-            Session = sessionmaker(bind=self.engine)
+            settings = ConfigFarm.instance()
+            self.engine = create_engine('sqlite:///'+str(settings.get_db_path()), echo=True)
+            self.Session = sessionmaker(bind=self.engine, future=True, expire_on_commit=False)   # This session maker should go in an __init__ file, next version
 
             Base.metadata.create_all(self.engine)
-
-            with Session() as session:
-                session.commit()
-                session.close()
-            #result = engine.execute("select * from table")
-
-            #load all data from the database into df??? (but probably not) and
-            # then delete the lines below
-
-            self.folder_path = os.path.join(os.getcwd(), "data")
-            self.group_file = os.path.join(self.folder_path, "__groups.csv")
-            self.supply_file = os.path.join(self.folder_path, "__supplies.csv")
-            self.animal_file = os.path.join(self.folder_path, "__animals.csv")
-            self.expense_file = os.path.join(self.folder_path, "__expenses.csv")
-            self.schedule_file = os.path.join(self.folder_path, "__schedules.csv")
-            self.gp_df=pd.read_csv(self.group_file)
-            self.su_df=pd.read_csv(self.supply_file)
-            self.an_df=pd.read_csv(self.animal_file)
-            self.ex_df=pd.read_csv(self.expense_file )
-            self.sc_df=pd.read_csv(self.schedule_file )
         except:
-            raise Exception("File error: Could not read db")
+            raise Exception("Could not create db")
 
-    def add_group(self, name):
-        self.row = pd.Series([0, name], index=self.gp_df.columns)
-        self.gp_df = self.gp_df.append(self.row, ignore_index=True)
-        try:
-            self.gp_df.to_csv(self.group_file, index=False)
-        except:
-            raise Exception("File error: Could not write to DB")
+    def get_groups(self):
+        statement = select(Group)
+        with self.Session.begin() as session:
+            self.results = session.execute(statement).scalars().all()
 
-    def add_supply(self, name, purchase_qty, units, price, notes, serving_qty):
-        self.row = pd.Series([0, name, purchase_qty, units, price, notes, serving_qty], index=self.su_df.columns)
-        self.su_df = self.su_df.append(self.row, ignore_index=True)
-        try:
-            self.su_df.to_csv(self.supply_file, index=False)
-        except:
-            raise Exception("File error: Could not write to DB")
+        return self.results
 
-    def add_animal(self, name, group, date_add, date_rem):
-        self.row = pd.Series([0, name, group, date_add, date_rem], index=self.an_df.columns)
-        self.an_df = self.an_df.append(self.row, ignore_index=True)
-        try:
-            self.an_df.to_csv(self.animal_file, index=False)
-        except:
-            raise Exception("File error: Could not write to DB")
+    def get_supplies(self):
+        statement = select(Supply)
+        with self.Session.begin() as session:
+            self.results = session.execute(statement).scalars().all()
 
-    def add_expense(self, name, cost, group, animal, supply):
-        self.row = pd.Series([0, name, cost, group, animal, supply], index=self.ex_df.columns)
-        self.ex_df = self.ex_df.append(self.row, ignore_index=True)
-        try:
-            self.ex_df.to_csv(self.expense_file, index=False)
-        except:
-            raise Exception("File error: Could not write to DB")
+        return self.results
 
-    def add_schedule(self, name, animal, supply, qty, day_time):
-        self.row = pd.Series([0, name, animal, supply, qty, day_time], index=self.sc_df.columns)
-        self.sc_df = self.sc_df.append(self.row, ignore_index=True)
-        try:
-            self.sc_df.to_csv(self.schedule_file, index=False)
-        except:
-            raise Exception("File error: Could not write to DB")
+    def get_animals(self):
+        statement = select(Animal)
+        with self.Session.begin() as session:
+            self.results = session.execute(statement).scalars().all()
 
-    def refresh(self, flag):
-        try:
-            if flag == "groups":
-                self.df=pd.read_csv(self.group_file)
-            elif flag == "supplies":
-                self.df=pd.read_csv(self.supply_file)
-            elif flag == "animals":
-                self.df=pd.read_csv(self.animal_file)
-            elif flag == "expenses":
-                self.df=pd.read_csv(self.expense_file)
-            elif flag == "schedules":
-                self.df=pd.read_csv(self.schedule_file)
-            else:
-                raise Exception("No flag found")
-        except:
-            raise Exception("File error: Could not read db")
-        return self.df
+        return self.results
 
+    def get_expenses(self):
+        statement = select(Expense)
+        with self.Session.begin() as session:
+            self.results = session.execute(statement).scalars().all()
 
+        return self.results
 
-#
-    #d = DATE(
-    #   storage_format="%(month)02d/%(day)02d/%(year)04d",
-    #   regexp=re.compile("(?P<month>\d+)/(?P<day>\d+)/(?P<year>\d+)")
-    #)
-#metadata.drop_all
-#table.create(
-#table.drop
+    def get_schedules(self):
+        statement = select(Schedule)
+        with self.Session.begin() as session:
+            self.results = session.execute(statement).scalars().all()
 
-#           Column('timestamp', DateTime),
-#           Column('amount', Numeric(10, 2)),
-#           Column('type', Enum('a', 'b', 'c')) #this creates a data constraint
-#           Column('email_address', String(100), nullable=False),
-#           Column('user_id', Integer, ForeignKey('user.id')),
+        return self.results
 
-#   ORM
+    def add_group(self, new_name):
+        gp = Group(name=new_name)
+        with self.Session.begin() as session:
+            session.add(gp)
+        return self.get_groups()
 
-#ed_user = User(....
-#session.add(ed_user)
-#our_user = session.query(User).filter_by(name='ed').first()
-#this ^ is unit of work in a nutshell, ORM doing its thing
-#session.rollback()
-#session.flush()
+    def add_supply(self, new_name, p_qty, new_units, new_price, new_notes, s_qty):
+        sup = Supply(name=new_name, purchase_qty=p_qty, units=new_units, price=new_price, notes=new_notes, serving_qty=s_qty)
+        with self.Session.begin() as session:
+            session.add(sup)
+        return self.get_supplies()
+
+    def add_animal(self, new_name, new_group, d_add, d_rem):
+        an = Animal(name=new_name, group=new_group, date_add=d_add, date_rm=d_rem)
+        with self.Session.begin() as session:
+            session.add(an)
+        return self.get_animals()
+
+    def add_expense(self, new_name, new_cost, new_group, new_animal, new_supply):
+        exs = Supply(name=new_name, cost=new_cost, group=new_group, animal=new_animal, supply=new_supply)
+        with self.Session.begin() as session:
+            session.add(exs)
+        return self.get_expenses()
+
+    def add_schedule(self, new_name, new_animal, new_supply, new_qty, new_day_time):
+        sch = Schedule(name=new_name, animal=new_animal, supply=new_supply, qty=new_qty, day_time=new_day_time)
+        with self.Session.begin() as session:
+            session.add(sch)
+        return self.get_schedules()
 
 #   ORM Querying
-
-#print(User.name == "ed")
-#query = session.query(User).filter(User.name == 'ed').order_by(User.id)
-#query.all()
-
-#for row in session.query(User, User.name):
-#    print(row.User, row.name)
- #u = session.query(User).order_by(User.id)[2] #grabs the second element, array slices [1:3]
-
-#q = session.query(User.fullname)
-#q.all()
-#q2 = q.filter(or_(User.name == 'mary', User.name == 'ed'))
-#q2[1]
-
-
-#session.commit()
-
-#session.query(User, Address).join(User.addresses).all()
-#session.query(User, Address).join(Address).all() # only if simple
-#                           .filter(Address.email_address == 'jack@......first()
-
-#a1, a2 = aliased(Address), aliased(Address)
-# to create aliases inside the SQL
 
 #import func SQLAlchemy
 # gives us count, max, etc...
@@ -177,8 +115,11 @@ class FarmDB():
 #for user in session.query(User).options(subqueryload(User.addresses)):
     #print(user, user.addresses)
     #eager loading of addresses, so it doesn't do n+1 sql queries
-#options(contains eager)....
-#delete cascade delete orphans
+#           Column('timestamp', DateTime),
+#           Column('amount', Numeric(10, 2)),
+#           Column('type', Enum('a', 'b', 'c')) #this creates a data constraint
+#           Column('email_address', String(100), nullable=False),
+#           Column('user_id', Integer, ForeignKey('user.id')),
 
 
 class Group(Base):
@@ -192,6 +133,13 @@ class Group(Base):
 
     def __repr__(self):
         return f"Group(id={self.id!r}, name={self.name!r})"
+
+    @classmethod
+    def header(cls):
+        return ["name"]
+
+    def __getitem__(self, idx):
+        return getattr(self, self.header()[idx])
 
 
 class Animal(Base):
@@ -209,6 +157,13 @@ class Animal(Base):
 
     def __repr__(self):
         return f"Animal(id={self.id!r}, name={self.name!r}, date_add={self.date_add!r}, date_rm={self.date_rm!r})"
+
+    @classmethod
+    def header(cls):
+        return ["name", "group_id", "date_add", "date_rm"]
+
+    def __getitem__(self, idx):
+        return getattr(self, self.header()[idx])
 
 
 class Expense(Base):
@@ -228,6 +183,13 @@ class Expense(Base):
     def __repr__(self):
         return f"Expense(id={self.id!r}, name={self.name!r}, amount={self.amount!r}, date={self.date!r})"
 
+    @classmethod
+    def header(cls):
+        return ["name", "amount", "group_id", "animal_id", "date"]
+
+    def __getitem__(self, idx):
+        return getattr(self, self.header()[idx])
+
 
 class Supply(Base):
     __tablename__ = 'supply'
@@ -239,12 +201,19 @@ class Supply(Base):
     price = Column(Float, nullable=False)
     serving_qty = Column(Float, nullable=False)
     notes = Column(String, nullable=True)
-    date_purchase = Column(Date, nullable=False)
+    date_purchase = Column(Date, nullable=True)
 
     schedules = relationship("Schedule", back_populates="supply")
 
     def __repr__(self):
         return f"Supply(id={self.id!r}, name={self.name!r}, purchase_qty={self.purchase_qty!r}, units={self.units!r}, price={self.price!r}, serving_qty={self.serving_qty!r}, notes={self.notes!r}, date_purchase={self.date_purchase!r})"
+
+    @classmethod
+    def header(cls):
+        return ["name", "purchase_qty", "units", "price", "serving_qty", "notes", "date_purchase"]
+
+    def __getitem__(self, idx):
+        return getattr(self, self.header()[idx])
 
 
 class Schedule(Base):
@@ -262,3 +231,10 @@ class Schedule(Base):
 
     def __repr__(self):
         return f"Schedule(id={self.id!r}, name={self.name!r}, purchase_qty={self.purchase_qty!r}, units={self.units!r}, price={self.price!r}, serving_qty={self.serving_qty!r}, notes={self.notes!r}, date_purchase={self.date_purchase!r})"
+
+    @classmethod
+    def header(cls):
+        return ["name", "animal_id", "supply_id", "qty", "day_time"]
+
+    def __getitem__(self, idx):
+        return getattr(self, self.header()[idx])

@@ -2,9 +2,10 @@
 
 from PySide6.QtWidgets import (QWidget, QFormLayout, QTableView, QLabel, QLineEdit, QPushButton)
 from PySide6.QtCore import QRect
-from ui.pandas_model import PandasModel
+from model.pandas_model import PandasModel
 from controller.farm import Farm
 import pandas as pd
+
 
 class GroupWidget(QWidget):
     def __init__(self):
@@ -36,6 +37,7 @@ class GroupWidget(QWidget):
         except:
             self.farm = pd.DataFrame()
 
+        print("group widget:"+str(self.farm[0]))
         model = PandasModel(self.farm)
         self.farmview.setModel(model)
 

@@ -6,10 +6,8 @@ from PySide6.QtCore import Qt
 from ui.group_widget import GroupWidget
 from ui.schedule_widget import ScheduleWidget
 from ui.expense_widget import ExpenseWidget
-from ui.create_group_dialog import CreateGroupDialog
-from ui.pandas_model import PandasModel
+from model.pandas_model import PandasModel
 from controller.farm import Farm
-from model.exporter import Exporter
 import pandas as pd
 import os, os.path
 import sys

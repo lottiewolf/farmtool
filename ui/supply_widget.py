@@ -1,11 +1,22 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QWidget, QFormLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget)
+from PySide6.QtWidgets import (
+    QWidget,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QComboBox,
+    QDateEdit,
+    QPushButton,
+    QCalendarWidget,
+    QDoubleSpinBox,
+)
 from PySide6.QtWidgets import (QGroupBox, QTableView, )
 from PySide6.QtCore import (Qt, QRect, QDateTime)
-from ui.pandas_model import PandasModel
+from model.pandas_model import PandasModel
 from controller.farm import Farm
 import pandas as pd
+
 
 class SupplyWidget(QWidget):
     def __init__(self):
@@ -21,11 +32,11 @@ class SupplyWidget(QWidget):
         self.layout.addRow(self.farmview)
 
         self.supply_name = QLineEdit()
-        self.purchase_qty = QLineEdit()
+        self.purchase_qty = QDoubleSpinBox()
         self.units = QLineEdit()
-        self.price = QLineEdit()
+        self.price = QDoubleSpinBox()
         self.notes = QLineEdit()
-        self.serving_qty = QLineEdit()
+        self.serving_qty = QDoubleSpinBox()
         self.layout.addRow(QLabel("Supply Name"), self.supply_name)
         self.layout.addRow(QLabel("Purchase Quantity"), self.purchase_qty)
         self.layout.addRow(QLabel("Units"), self.units)
@@ -53,15 +64,22 @@ class SupplyWidget(QWidget):
     def add_supply(self):
         try:
             #also should pass an image of receipt
-            self.supplies = Farm.instance().add_supply(self.supply_name.text(), self.purchase_qty.text(), self.units.text(), self.price.text(), self.notes.text(), self.serving_qty.text())
+            self.supplies = Farm.instance().add_supply(
+                self.supply_name.text(),
+                self.purchase_qty.value(),
+                self.units.text(),
+                self.price.value(),
+                self.notes.text(),
+                self.serving_qty.value(),
+            )
         except:
             raise Exception("Could not modify supplies.")
 
         self.supply_name.setText("")
-        self.purchase_qty.setText("")
+        self.purchase_qty.setValue(0.0)
         self.units.setText("")
-        self.price.setText("")
+        self.price.setValue(0.0)
         self.notes.setText("")
-        self.serving_qty.setText("")
+        self.serving_qty.setValue(0.0)
         model = PandasModel(self.supplies)
         self.farmview.setModel(model)

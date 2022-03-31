@@ -3,7 +3,7 @@
 from PySide6.QtWidgets import (QGroupBox, QTableView, QFormLayout)
 from PySide6.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget)
 from PySide6.QtCore import (Qt, QRect, QDateTime)
-from ui.pandas_model import PandasModel
+from model.pandas_model import PandasModel
 from controller.farm import Farm
 import pandas as pd
 

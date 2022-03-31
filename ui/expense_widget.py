@@ -1,9 +1,9 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget)
+from PySide6.QtWidgets import (QWidget, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget, QDoubleSpinBox)
 from PySide6.QtWidgets import (QGroupBox, QTableView, QFormLayout)
 from PySide6.QtCore import (Qt, QRect, QDateTime)
-from ui.pandas_model import PandasModel
+from model.pandas_model import PandasModel
 from controller.farm import Farm
 import pandas as pd
 
@@ -21,15 +21,13 @@ class ExpenseWidget(QWidget):
         self.layout.addRow(self.farmview)
 
         self.ex_name = QLineEdit()
-        self.ex_cost = QLineEdit()
+        self.ex_cost = QDoubleSpinBox()
         self.ex_group = QLineEdit()
         self.ex_animal = QLineEdit()
-        self.ex_supply = QLineEdit()
         self.layout.addRow(QLabel("Name of Expense"), self.ex_name)
         self.layout.addRow(QLabel("Cost"), self.ex_cost)
         self.layout.addRow(QLabel("Group"), self.ex_group)
         self.layout.addRow(QLabel("Animal"), self.ex_animal)
-        self.layout.addRow(QLabel("Supply"), self.ex_supply)
         self.gp_button = QPushButton("Add")
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
         self.layout.addRow(self.gp_button)
@@ -50,7 +48,7 @@ class ExpenseWidget(QWidget):
 
     def add_expense(self):
         try:
-            self.expenses = Farm.instance().add_expense(self.ex_name.text(), self.ex_cost.text(), self.ex_group.text(), self.ex_animal.text(), self.ex_supply.text())
+            self.expenses = Farm.instance().add_expense(self.ex_name.text(), self.ex_cost.value(), self.ex_group.text(), self.ex_animal.text())
         except:
             raise Exception("Could not modify expenses.")
 

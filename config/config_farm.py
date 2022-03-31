@@ -24,7 +24,7 @@ class ConfigFarm:
         self.folder_path = os.path.join(os.getcwd(), "config")
         self.settings_file = os.path.join(self.folder_path, "__settings.xml")
         self.name = ""
-        self.db_path = os.path.join(os.getcwd(), "data/farmtool.db")
+        self.db_path = "model/farmtool.db"
         self.version = "0.1"
 
     def load(self):

@@ -57,10 +57,5 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(self.title_version + "  -  " +
                             str(settings.get_name()) + " Overview")
-        self.gp_tab.update_gp()
-        self.anim_tab.update_anim()
-        self.sched_tab.update_sched()
-        self.supply_tab.update_supply()
-        self.expense_tab.update_expense()
         self.tabs.setCurrentIndex(0)
         self.show()

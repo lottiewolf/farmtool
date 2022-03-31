@@ -1,9 +1,10 @@
 # This Python file uses the following encoding: utf-8
 
+from config.config_farm import ConfigFarm
 import sys
 import os
 import pandas as pd
-from controller.farm import (Animal, Group, Expense, Schedule, Supply)
+
 
 class Exporter:
     def __init__(self):
@@ -33,6 +34,7 @@ class Exporter:
 
 #        self.folder_path = os.path.join(os.getcwd(), "data")
 #        self.settings_file = os.path.join(self.folder_path, "__settings.xml")
+#        self.gp_df=pd.read_csv(self.group_file)
 # Create Groups file
 # df = pd.DataFrame([], columns=['name'])
 # df.to_csv(self.group_file)
@@ -46,3 +48,20 @@ class Exporter:
 #    self.schedule_df=pd.read_csv(self.schedule_file)
 # except:
 #    raise Exception("File error: Not able to read group, supply, animal, expense, or schedule file(s)")
+# def refresh(self, flag):
+#    try:
+#        if flag == "groups":
+#            self.df=pd.read_csv(self.group_file)
+#        elif flag == "supplies":
+#            self.df=pd.read_csv(self.supply_file)
+#        elif flag == "animals":
+#            self.df=pd.read_csv(self.animal_file)
+#        elif flag == "expenses":
+#            self.df=pd.read_csv(self.expense_file)
+#        elif flag == "schedules":
+#            self.df=pd.read_csv(self.schedule_file)
+#        else:
+#            raise Exception("No flag found")
+#    except:
+#        raise Exception("Could not read db")
+#    return self.df

@@ -1,11 +1,23 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide6.QtWidgets import (QWidget, QFormLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDateEdit, QPushButton, QCalendarWidget)
-from PySide6.QtCore import (Qt, QRect, QDateTime)
-from PySide6.QtWidgets import (QGroupBox, QTableView, QFormLayout)
-from ui.pandas_model import PandasModel
+from PySide6.QtWidgets import (
+    QWidget,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QComboBox,
+    QDateEdit,
+    QPushButton,
+    QCalendarWidget,
+    QTableView,
+    QGroupBox,
+)
+from PySide6.QtCore import (QRect, QDateTime)
+from model.pandas_model import PandasModel
+from model.list_model import ListModel
 from controller.farm import Farm
 import pandas as pd
+
 
 class AnimalWidget(QWidget):
     def __init__(self):
@@ -22,15 +34,10 @@ class AnimalWidget(QWidget):
 
         self.anim_name = QLineEdit()
         self.groups_list = QComboBox()
-        # This dropdown should be populated from a model, subclassed from QAbstractListModel.
-        # This should be done in Farm or Group or Animals, or perhaps a new class?
-        self.groups_list.addItems(self.get_group_list())
-        # The above line is terrible and should be replaced a model mechanism
-
-        #print(self.groups_list.model())
-        #print(self.groups_list.view())
+        self.groups_list.setModel(ListModel(Farm.instance().get_groups()))
         self.date_added = QDateEdit(calendarPopup=True)
         self.date_added.setDateTime(QDateTime.currentDateTime())
+
         self.layout.addRow(QLabel("Animal Name"), self.anim_name)
         self.layout.addRow(QLabel("Group Name"), self.groups_list)
         self.layout.addRow(QLabel("Date Added"), self.date_added)
@@ -46,7 +53,6 @@ class AnimalWidget(QWidget):
     def update_anim(self):
         try:
             self.animals = Farm.instance().get_animals()
-            self.groups = Farm.instance().get_groups()
         except:
             self.animals = pd.DataFrame()
 
@@ -54,22 +60,21 @@ class AnimalWidget(QWidget):
         self.farmview.setModel(model)
 
     def add_anim(self):
+        j = self.groups_list.currentIndex()
         try:
-            self.animals = Farm.instance().add_animal(self.anim_name.text(), self.groups_list.currentText(), self.date_added.date(), None)
+            self.animals = Farm.instance().add_animal(
+                self.anim_name.text(),
+                self.groups_list.model().currentObj(j),
+                self.date_added.date().toPython(),
+                self.date_added.date().toPython(),
+            )
         except:
             raise Exception("Could not modify animals.")
 
         self.anim_name.setText("")
         self.groups_list.clear()
-        self.groups_list.addItems(self.get_group_list())
+        self.groups_list.addItems(Farm.instance().get_group_list())
         self.date_added.setDateTime(QDateTime.currentDateTime())
         model = PandasModel(self.animals)
         self.farmview.setModel(model)
 
-    def get_group_list(self):
-        try:
-            self.update_anim()
-            self.g_list = self.groups.name.tolist()
-        except:
-            self.g_list = []
-        return self.g_list
