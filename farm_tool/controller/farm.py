@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from model.farm_db import FarmDB
+from farm_tool.model.farm_db import FarmDB
 
 
 class Farm:

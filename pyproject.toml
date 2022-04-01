@@ -1,0 +1,15 @@
+[project]
+name = "farm_tool"
+description = "farm_tool example package"
+version = "0.1"
+authors = [{name="Charlotte Wolf"}]
+dependencies = [
+	"pyside6",
+	"sqlalchemy",
+	"pandas",
+	"lxml",
+]
+[tool.setuptools.packages.find]
+include = ["farm_tool*"]
+[project.scripts]
+farm_tool = "farm_tool.main:run"

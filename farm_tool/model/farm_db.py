@@ -9,7 +9,7 @@ Created on Tue Feb 22 11:23:05 2022
 from sqlalchemy import (create_engine, select)
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy import (Sequence, Column, Integer, ForeignKey, String, DateTime, Date, Float)
-from config.config_farm import ConfigFarm
+from farm_tool.config.config_farm import ConfigFarm
 import pandas as pd
 
 Base = declarative_base()

@@ -10,11 +10,11 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
-from ui.group_widget import GroupWidget
-from ui.schedule_widget import ScheduleWidget
-from ui.expense_widget import ExpenseWidget
-from model.pandas_model import PandasModel
-from controller.farm import Farm
+from farm_tool.ui.group_widget import GroupWidget
+from farm_tool.ui.schedule_widget import ScheduleWidget
+from farm_tool.ui.expense_widget import ExpenseWidget
+from farm_tool.model.table_model import TableModel
+from farm_tool.controller.farm import Farm
 import pandas as pd
 import os, os.path
 import sys
@@ -50,7 +50,7 @@ class MainMenu(QMenuBar):
         self.menu2.addAction(rep_listAction)
         self.menu2.addAction(rep_plotAction)
 
-        #Create Help menu
+        # Create Help menu
         help_barAction = QAction("Show Help Bar", self.main_win)
         help_barAction.triggered.connect(self.help_bar)
         aboutAction = QAction("About Software", self.main_win)
@@ -85,12 +85,11 @@ class MainMenu(QMenuBar):
         sys.exit()
 
     def overview(self):
-        #self.main_win.show()
-        pass
+        self.main_win.update()
 
     def rep_list(self):
         self.main_win.layout = QFormLayout()
-        model = PandasModel(Farm.instance().get_groups())
+        model = TableModel(Farm.instance().get_expenses())
 
         farmview = QTableView()
         farmview.resize(500, 300)
@@ -108,7 +107,7 @@ class MainMenu(QMenuBar):
             folder_path = os.path.join(os.getcwd(), "data")
             farm_filename = os.path.join(folder_path, "schedule_db.csv")
             df=pd.read_csv(farm_filename)
-            model = PandasModel(df)
+            model = TableModel(df)
 
             farmview = QTableView()
             farmview.resize(500, 300)

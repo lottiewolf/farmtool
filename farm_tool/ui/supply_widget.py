@@ -10,8 +10,8 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox,
 )
 from PySide6.QtCore import QRect
-from model.pandas_model import PandasModel
-from controller.farm import Farm
+from farm_tool.model.table_model import TableModel
+from farm_tool.controller.farm import Farm
 import pandas as pd
 
 
@@ -55,7 +55,7 @@ class SupplyWidget(QWidget):
         except:
             self.supplies = pd.DataFrame()
 
-        model = PandasModel(self.supplies)
+        model = TableModel(self.supplies)
         self.farmview.setModel(model)
 
     def add_supply(self):
@@ -78,5 +78,5 @@ class SupplyWidget(QWidget):
         self.price.setValue(0.0)
         self.notes.setText("")
         self.serving_qty.setValue(0.0)
-        model = PandasModel(self.supplies)
+        model = TableModel(self.supplies)
         self.farmview.setModel(model)

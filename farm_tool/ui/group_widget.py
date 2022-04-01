@@ -9,8 +9,8 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import QRect
-from model.pandas_model import PandasModel
-from controller.farm import Farm
+from farm_tool.model.table_model import TableModel
+from farm_tool.controller.farm import Farm
 import pandas as pd
 
 
@@ -44,8 +44,7 @@ class GroupWidget(QWidget):
         except:
             self.farm = pd.DataFrame()
 
-        print("group widget:"+str(self.farm[0]))
-        model = PandasModel(self.farm)
+        model = TableModel(self.farm)
         self.farmview.setModel(model)
 
     def add_gp(self):
@@ -55,5 +54,5 @@ class GroupWidget(QWidget):
             raise Exception("Could not modify groups.")
 
         self.gp_name.setText("")
-        model = PandasModel(self.farm)
+        model = TableModel(self.farm)
         self.farmview.setModel(model)

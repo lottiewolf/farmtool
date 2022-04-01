@@ -4,7 +4,7 @@ from PySide6.QtCore import (QAbstractTableModel, Qt, QModelIndex)
 import pandas as pd
 
 
-class PandasModel(QAbstractTableModel):
+class TableModel(QAbstractTableModel):
     """A model to interface a Qt view with pandas dataframe """
 
     def __init__(self, data, parent=None):

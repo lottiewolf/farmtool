@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from config.config_farm import ConfigFarm
+from farm_tool.config.config_farm import ConfigFarm
 import sys
 import os
 import pandas as pd

@@ -12,9 +12,9 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import (QRect, QDateTime)
-from model.pandas_model import PandasModel
-from model.list_model import ListModel
-from controller.farm import Farm
+from farm_tool.model.table_model import TableModel
+from farm_tool.model.list_model import ListModel
+from farm_tool.controller.farm import Farm
 import pandas as pd
 
 
@@ -58,7 +58,7 @@ class ScheduleWidget(QWidget):
         except:
             self.schedules = pd.DataFrame()
 
-        model = PandasModel(self.schedules)
+        model = TableModel(self.schedules)
         self.farmview.setModel(model)
         self.animals.setModel(ListModel(Farm.instance().get_animals()))
         self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
@@ -82,5 +82,5 @@ class ScheduleWidget(QWidget):
         self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
         self.qty.setValue(0.0)
         self.date_start.setDateTime(QDateTime.currentDateTime())
-        model = PandasModel(self.schedules)
+        model = TableModel(self.schedules)
         self.farmview.setModel(model)

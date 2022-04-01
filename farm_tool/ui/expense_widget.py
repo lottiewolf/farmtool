@@ -3,21 +3,22 @@
 from PySide6.QtWidgets import (
     QWidget,
     QFormLayout,
-    QLabel,
+    QTableView,
     QLineEdit,
+    QDoubleSpinBox,
     QComboBox,
     QDateEdit,
+    QLabel,
     QPushButton,
-    QTableView,
 )
 from PySide6.QtCore import (QRect, QDateTime)
-from model.pandas_model import PandasModel
-from model.list_model import ListModel
-from controller.farm import Farm
+from farm_tool.model.table_model import TableModel
+from farm_tool.model.list_model import ListModel
+from farm_tool.controller.farm import Farm
 import pandas as pd
 
 
-class AnimalWidget(QWidget):
+class ExpenseWidget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
@@ -31,47 +32,55 @@ class AnimalWidget(QWidget):
         self.layout.addRow(self.farmview)
 
         self.name = QLineEdit()
+        self.cost = QDoubleSpinBox()
         self.groups = QComboBox()
+        self.animals = QComboBox()
         self.date_added = QDateEdit(calendarPopup=True)
         self.date_added.setDateTime(QDateTime.currentDateTime())
 
-        self.layout.addRow(QLabel("Animal Name"), self.name)
-        self.layout.addRow(QLabel("Group Name"), self.groups)
+        self.layout.addRow(QLabel("Name of Expense"), self.name)
+        self.layout.addRow(QLabel("Cost"), self.cost)
+        self.layout.addRow(QLabel("Group"), self.groups)
+        self.layout.addRow(QLabel("Animal"), self.animals)
         self.layout.addRow(QLabel("Date Added"), self.date_added)
         self.gp_button = QPushButton("Add")
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
         self.layout.addRow(self.gp_button)
-        self.gp_button.clicked.connect(self.add_anim)
+        self.gp_button.clicked.connect(self.add_expense)
 
         self.setLayout(self.layout)
 
-        self.update_anim()
+        self.update_expense()
 
-    def update_anim(self):
+    def update_expense(self):
         try:
-            self.animals = Farm.instance().get_animals()
+            self.expenses = Farm.instance().get_expenses()
         except:
-            self.animals = pd.DataFrame()
+            self.expenses = pd.DataFrame()
 
-        model = PandasModel(self.animals)
+        model = TableModel(self.expenses)
         self.farmview.setModel(model)
         self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.animals.setModel(ListModel(Farm.instance().get_animals()))
 
-    def add_anim(self):
-        i = self.groups.currentIndex()
+    def add_expense(self):
+        g_i = self.groups.currentIndex()
+        a_i = self.animals.currentIndex()
         try:
-            self.animals = Farm.instance().add_animal(
+            self.expenses = Farm.instance().add_expense(
                 self.name.text(),
-                self.groups.model().currentObj(i),
-                self.date_added.date().toPython(),
+                self.cost.value(),
+                self.groups.model().currentObj(g_i),
+                self.animals.model().currentObj(a_i),
                 self.date_added.date().toPython(),
             )
         except:
-            raise Exception("Could not modify animals.")
+            raise Exception("Could not modify expenses.")
 
         self.name.setText("")
+        self.cost.setValue(0.0)
         self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.animals.setModel(ListModel(Farm.instance().get_animals()))
         self.date_added.setDateTime(QDateTime.currentDateTime())
-        model = PandasModel(self.animals)
+        model = TableModel(self.expenses)
         self.farmview.setModel(model)
-

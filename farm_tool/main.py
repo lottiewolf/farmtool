@@ -1,11 +1,11 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide6.QtWidgets import (QApplication)
-from config.config_farm import ConfigFarm
-from ui.main_window import MainWindow
+from farm_tool.config.config_farm import ConfigFarm
+from farm_tool.ui.main_window import MainWindow
 import sys
 
-if __name__ == "__main__":
+def run():
     app = QApplication([])
 
     settings = ConfigFarm.instance()
@@ -14,4 +14,8 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
+if __name__ == "__main__":
+    run()
+
 
