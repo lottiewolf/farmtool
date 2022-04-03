@@ -21,12 +21,12 @@ class ConfigFarm:
     def init_settings(self):
         self.is_loaded = False
         self.not_named = True
-        self.farmtool_path = os.path.join(os.getcwd(), "farm_tool")
-        self.config_path = os.path.join(self.farmtool_path, "config")
-        self.model_path = os.path.join(self.farmtool_path, "model")
-        self.settings_file = os.path.join(self.config_path, "__settings.xml")
+        self.data_path = os.path.join(os.getcwd(), "farmtool_data")
+        os.mkdir(path=self.data_path)
+        print("made new dir")
+        self.settings_file = os.path.join(self.data_path, "__settings.xml")
         self.name = ""
-        self.db_path = os.path.join(self.model_path, "farmtool.db")
+        self.db_path = os.path.join(self.data_path, "farmtool.db")
         self.version = "0.1"
 
     def load(self):
