@@ -3,6 +3,7 @@
 import os, os.path
 import pandas as pd
 
+
 class ConfigFarm:
     _instance = None
 
@@ -22,8 +23,10 @@ class ConfigFarm:
         self.is_loaded = False
         self.not_named = True
         self.data_path = os.path.join(os.getcwd(), "farmtool_data")
-        os.mkdir(path=self.data_path)
-        print("made new dir")
+        try:
+            os.mkdir(path=self.data_path)
+        except:
+            print("Directory already exists... accessing.")
         self.settings_file = os.path.join(self.data_path, "__settings.xml")
         self.name = ""
         self.db_path = os.path.join(self.data_path, "farmtool.db")
@@ -33,9 +36,9 @@ class ConfigFarm:
         # Load Settings File
         try:
             self.settings_df = pd.read_xml(self.settings_file)
-            self.name = self.settings_df.at[0,'farm_name']
-            self.db_path = self.settings_df.at[0,'db_path']
-            self.version = self.settings_df.at[0,'version_num']
+            self.name = self.settings_df.at[0, 'farm_name']
+            self.db_path = self.settings_df.at[0, 'db_path']
+            self.version = self.settings_df.at[0, 'version_num']
             self.is_loaded = True
             self.not_named = False
         except:
@@ -43,7 +46,7 @@ class ConfigFarm:
 
     def save_settings(self):
         data = [[self.name, self.db_path, self.version]]
-        self.settings_df = pd.DataFrame(data,columns=['farm_name','db_path','version_num'])
+        self.settings_df = pd.DataFrame(data, columns=['farm_name', 'db_path', 'version_num'])
         self.settings_df.to_xml(self.settings_file)
         print("Settings saved.")
 
@@ -63,8 +66,3 @@ class ConfigFarm:
 
     def is_not_named(self):
         return self.not_named
-
-
-
-
-
