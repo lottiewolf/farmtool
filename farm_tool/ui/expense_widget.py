@@ -33,6 +33,7 @@ class ExpenseWidget(QWidget):
 
         self.name = QLineEdit()
         self.cost = QDoubleSpinBox()
+        self.cost.setRange(0.0, 1000000)
         self.groups = QComboBox()
         self.animals = QComboBox()
         self.date_added = QDateEdit(calendarPopup=True)
@@ -61,7 +62,9 @@ class ExpenseWidget(QWidget):
         model = TableModel(self.expenses)
         self.farmview.setModel(model)
         self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.groups.setCurrentIndex(-1)
         self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.animals.setCurrentIndex(-1)
 
     def add_expense(self):
         g_i = self.groups.currentIndex()
@@ -80,7 +83,9 @@ class ExpenseWidget(QWidget):
         self.name.setText("")
         self.cost.setValue(0.0)
         self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.groups.setCurrentIndex(-1)
         self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.animals.setCurrentIndex(-1)
         self.date_added.setDateTime(QDateTime.currentDateTime())
         model = TableModel(self.expenses)
         self.farmview.setModel(model)

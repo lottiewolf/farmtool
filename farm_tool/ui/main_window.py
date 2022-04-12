@@ -9,6 +9,7 @@ from farm_tool.ui.animal_widget import AnimalWidget
 from farm_tool.ui.schedule_widget import ScheduleWidget
 from farm_tool.ui.supply_widget import SupplyWidget
 from farm_tool.ui.expense_widget import ExpenseWidget
+from farm_tool.ui.report_widget import ReportWidget
 from farm_tool.ui.help_widget import HelpWidget
 from farm_tool.ui.create_farm_dialog import CreateFarmDialog
 import sys
@@ -62,12 +63,14 @@ class MainWindow(QMainWindow):
         self.sched_tab = ScheduleWidget()
         self.supply_tab = SupplyWidget()
         self.expense_tab = ExpenseWidget()
+        self.report_tab = ReportWidget()
 
         self.tabs.addTab(self.gp_tab, "Groups")
         self.tabs.addTab(self.anim_tab, "Animals")
         self.tabs.addTab(self.sched_tab, "Schedules")
         self.tabs.addTab(self.supply_tab, "Supplies")
         self.tabs.addTab(self.expense_tab, "Expenses")
+        self.tabs.addTab(self.report_tab, "Report")
 
         self.setWindowTitle(self.title_version + "  -  " +
                             str(self.settings.get_name()) + " Overview")

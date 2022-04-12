@@ -29,8 +29,8 @@ class Farm:
         self.supplies = self.db.get_supplies()
         return self.supplies
 
-    def get_animals(self):
-        self.animals = self.db.get_animals()
+    def get_animals(self, gp_id=-1):
+        self.animals = self.db.get_animals(gp_id)
         return self.animals
 
     def get_expenses(self):
@@ -41,33 +41,12 @@ class Farm:
         self.schedules = self.db.get_schedules()
         return self.schedules
 
-    def get_group_list(self):
-        self.groups = self.get_groups()
-        self.g_list = []
-        for g in self.groups:
-            self.g_list.append(g.name)
-        return self.g_list
-
-    def get_animal_list(self):
-        self.anims = self.get_animals()
-        self.a_list = []
-        for a in self.anims:
-            self.a_list.append(a.name)
-        return self.a_list
-
-    def get_supply_list(self):
-        self.sups = self.get_supplies()
-        self.s_list = []
-        for s in self.sups:
-            self.s_list.append(s.name)
-        return self.s_list
-
     def add_group(self, name):
         self.groups = self.db.add_group(name)
         return self.groups
 
-    def add_supply(self, name, purchase_qty, units, price, notes, serving_qty):
-        self.supplies = self.db.add_supply(name, purchase_qty, units, price, notes, serving_qty)
+    def add_supply(self, name, price, purchase_qty, units, notes, p_date, file):
+        self.supplies = self.db.add_supply(name, price, purchase_qty, units, notes, p_date, file)
         return self.supplies
 
     def add_animal(self, name, group, date_add, date_rm):
@@ -78,7 +57,7 @@ class Farm:
         self.expenses = self.db.add_expense(name, cost, group, animal, date)
         return self.expenses
 
-    def add_schedule(self, name, animal, supply, qty, day_time):
-        self.schedules = self.db.add_schedule(name, animal, supply, qty, day_time)
+    def add_schedule(self, name, animal, supply, qty, fq, s_date, e_date):
+        self.schedules = self.db.add_schedule(name, animal, supply, qty, fq, s_date, e_date)
         return self.schedules
 

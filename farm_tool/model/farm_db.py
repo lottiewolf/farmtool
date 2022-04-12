@@ -50,28 +50,33 @@ class FarmDB():
         statement = select(Supply)
         with self.Session.begin() as session:
             self.results = session.execute(statement).scalars().all()
-
         return self.results
 
-    def get_animals(self):
-        statement = select(Animal)
-        with self.Session.begin() as session:
-            self.results = session.execute(statement).scalars().all()
-
+    def get_animals(self, gp_id=-1):
+        if(gp_id==-1):
+            statement = select(Animal)
+            with self.Session.begin() as session:
+                self.results = session.execute(statement).scalars().all()
+        else:
+            statement = select(Animal).where(Animal.group_id == gp_id)
+            with self.Session.begin() as session:
+                self.results = session.execute(statement).scalars().all()
         return self.results
 
-    def get_expenses(self):
+    def get_expenses(self, gp_id=-1, anim_id=-1):
         statement = select(Expense)
         with self.Session.begin() as session:
             self.results = session.execute(statement).scalars().all()
-
         return self.results
 
-    def get_schedules(self):
-        statement = select(Schedule)
-        with self.Session.begin() as session:
-            self.results = session.execute(statement).scalars().all()
-
+    def get_schedules(self, anim_id=-1):
+        if(anim_id==-1):
+            statement = select(Schedule)
+            with self.Session.begin() as session:
+                self.results = session.execute(statement).scalars().all()
+        else:
+            #select all schedules where anim_id=anim_id
+            pass
         return self.results
 
     def add_group(self, new_name):
@@ -80,14 +85,14 @@ class FarmDB():
             session.add(gp)
         return self.get_groups()
 
-    def add_supply(self, new_name, p_qty, new_units, new_price, new_notes, s_qty):
-        sup = Supply(name=new_name, purchase_qty=p_qty, units=new_units, price=new_price, notes=new_notes, serving_qty=s_qty)
+    def add_supply(self, name, price, p_qty, units, notes, d_purchase, invoice):
+        sup = Supply(name=name, price=price, purchase_qty=p_qty, units=units, notes=notes, date_purchased=d_purchase, invoice=invoice)
         with self.Session.begin() as session:
             session.add(sup)
         return self.get_supplies()
 
-    def add_animal(self, new_name, new_group, d_add, d_rem):
-        an = Animal(name=new_name, group=new_group, date_add=d_add, date_rm=d_rem)
+    def add_animal(self, name, group, d_add, d_rem):
+        an = Animal(name=name, group=group, date_added=d_add, date_removed=d_rem)
         with self.Session.begin() as session:
             session.add(an)
         return self.get_animals()
@@ -98,8 +103,8 @@ class FarmDB():
             session.add(exs)
         return self.get_expenses()
 
-    def add_schedule(self, new_name, new_animal, new_supply, new_qty, new_day_time):
-        sch = Schedule(name=new_name, animal=new_animal, supply=new_supply, qty=new_qty, day_time=new_day_time)
+    def add_schedule(self, name, animal, supply, qty, fq, s_date, e_date):
+        sch = Schedule(name=name, animal=animal, supply=supply, qty=qty, frequency=fq, date_started=s_date, date_ended=e_date)
         with self.Session.begin() as session:
             session.add(sch)
         return self.get_schedules()
@@ -148,19 +153,19 @@ class Animal(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     group_id = Column(Integer, ForeignKey('farm_groups.id'), nullable=False)
-    date_add = Column(Date, nullable=False)
-    date_rm = Column(Date, nullable=True)
+    date_added = Column(Date, nullable=False)
+    date_removed = Column(Date, nullable=True)
 
     group = relationship("Group", back_populates="animals")
     expenses = relationship("Expense", back_populates="animal")
     schedules = relationship("Schedule", back_populates="animal")
 
     def __repr__(self):
-        return f"Animal(id={self.id!r}, name={self.name!r}, date_add={self.date_add!r}, date_rm={self.date_rm!r})"
+        return f"Animal(id={self.id!r}, name={self.name!r}, date_add={self.date_added!r}, date_rm={self.date_removed!r})"
 
     @classmethod
     def header(cls):
-        return ["name", "group_id", "date_add", "date_rm"]
+        return ["name", "group_id", "date_added", "date_removed"]
 
     def __getitem__(self, idx):
         return getattr(self, self.header()[idx])
@@ -196,21 +201,21 @@ class Supply(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    price = Column(Float, nullable=False)
     purchase_qty = Column(Float, nullable=False)
     units = Column(String, nullable=False)
-    price = Column(Float, nullable=False)
-    serving_qty = Column(Float, nullable=False)
     notes = Column(String, nullable=True)
-    date_purchase = Column(Date, nullable=True)
+    date_purchased = Column(Date, nullable=False)
+    invoice = Column(String)
 
     schedules = relationship("Schedule", back_populates="supply")
 
     def __repr__(self):
-        return f"Supply(id={self.id!r}, name={self.name!r}, purchase_qty={self.purchase_qty!r}, units={self.units!r}, price={self.price!r}, serving_qty={self.serving_qty!r}, notes={self.notes!r}, date_purchase={self.date_purchase!r})"
+        return f"Supply(id={self.id!r}, name={self.name!r}, qty={self.purchase_qty!r}, units={self.units!r}, price={self.price!r}, inv={self.invoice!r}, date={self.date_purchased!r})"
 
     @classmethod
     def header(cls):
-        return ["name", "purchase_qty", "units", "price", "serving_qty", "notes", "date_purchase"]
+        return ["name", "price", "purchase_qty", "units", "notes", "date_purchased", "invoice"]
 
     def __getitem__(self, idx):
         return getattr(self, self.header()[idx])
@@ -224,17 +229,19 @@ class Schedule(Base):
     animal_id = Column(Integer, ForeignKey('animal.id'), nullable=False)
     supply_id = Column(Integer, ForeignKey('supply.id'), nullable=False)
     qty = Column(Float, nullable=False)
-    day_time = Column(Date, nullable=False)
+    frequency = Column(Float, nullable=False)
+    date_started = Column(Date, nullable=False)
+    date_ended = Column(Date, nullable=True)
 
     animal = relationship("Animal", back_populates="schedules")
     supply = relationship("Supply", back_populates="schedules")
 
     def __repr__(self):
-        return f"Schedule(id={self.id!r}, name={self.name!r}, purchase_qty={self.purchase_qty!r}, units={self.units!r}, price={self.price!r}, serving_qty={self.serving_qty!r}, notes={self.notes!r}, date_purchase={self.date_purchase!r})"
+        return f"Schedule(id={self.id!r}, name={self.name!r}, qty={self.qty!r}, qty={self.qty!r}, date={self.date_started!r})"
 
     @classmethod
     def header(cls):
-        return ["name", "animal_id", "supply_id", "qty", "day_time"]
+        return ["name", "animal_id", "supply_id", "qty", "frequency"]
 
     def __getitem__(self, idx):
         return getattr(self, self.header()[idx])
