@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
-from farm_tool.ui.group_widget import GroupWidget
 from farm_tool.ui.schedule_widget import ScheduleWidget
 from farm_tool.ui.expense_widget import ExpenseWidget
 from farm_tool.model.table_model import TableModel
@@ -64,11 +63,11 @@ class MainMenu(QMenuBar):
         if self.gp_dlg.exec():
             Farm.instance().add_group(self.gp_dlg.textValue())
 
-        self.g_widget = GroupWidget()
-        self.mainLayout = QVBoxLayout()
-        self.mainLayout.addWidget(self.g_widget)
-        self.main_win.setLayout(self.mainLayout)
-        self.main_win.setCentralWidget(self.g_widget)
+        #self.g_widget = GroupWidget()
+        #self.mainLayout = QVBoxLayout()
+        #self.mainLayout.addWidget(self.g_widget)
+        #self.main_win.setLayout(self.mainLayout)
+        #self.main_win.setCentralWidget(self.g_widget)
 
     def e_data(self):
         self.gp_dlg = CreateGroupDialog()
@@ -85,7 +84,7 @@ class MainMenu(QMenuBar):
         sys.exit()
 
     def overview(self):
-        self.main_win.update()
+        self.main_win.show_tabs()
 
     def rep_list(self):
         self.main_win.layout = QFormLayout()

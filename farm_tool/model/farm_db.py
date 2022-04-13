@@ -110,22 +110,10 @@ class FarmDB():
         return self.get_schedules()
 
 #   ORM Querying
-
-#import func SQLAlchemy
-# gives us count, max, etc...
-#derived tables (temp tables)....
-
 #from sqlalchemy.orm import subqueryload
-
 #for user in session.query(User).options(subqueryload(User.addresses)):
     #print(user, user.addresses)
     #eager loading of addresses, so it doesn't do n+1 sql queries
-#           Column('timestamp', DateTime),
-#           Column('amount', Numeric(10, 2)),
-#           Column('type', Enum('a', 'b', 'c')) #this creates a data constraint
-#           Column('email_address', String(100), nullable=False),
-#           Column('user_id', Integer, ForeignKey('user.id')),
-
 
 class Group(Base):
     __tablename__ = 'farm_groups'

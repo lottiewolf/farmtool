@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QDateEdit,
     QPushButton,
     QTableView,
+    QInputDialog,
 )
 from PySide6.QtCore import (QRect, QDateTime)
 from farm_tool.model.table_model import TableModel
@@ -52,26 +53,43 @@ class AnimalWidget(QWidget):
         self.tables = []
         for g in self.gps:
             # Set table view, which will display animals (of a group)
-            t_view = QTableView()
-            t_view.resize(500, 300)
-            t_view.horizontalHeader().setStretchLastSection(True)
-            t_view.setAlternatingRowColors(True)
-            t_view.setSelectionBehavior(QTableView.SelectRows)
-            self.tables.append(t_view)
-            self.v_tabs.addTab(t_view, g.name)
+            table = self.set_table()
+            self.v_tabs.addTab(table, g.name)
+        self.v_tabs.addTab(self.set_table(), "All")
+        self.v_tabs.addTab(self.set_table(), "+")
+        self.v_tabs.setCurrentIndex(0)
+        self.v_tabs.currentChanged.connect(self.change_tab)
+        self.display(0)
 
-        self.update_anim()
+    def change_tab(self):
+        self.display(self.v_tabs.currentIndex())
 
-    def update_anim(self, gp_i=0):
-        try:
+    def display(self, gp_i=0):
+        # if gp_i is in the range of gps, then get the animals in that group
+        if(gp_i < len(self.gps)):
             self.animals = Farm.instance().get_animals(gp_id=self.gps[gp_i].id)
-        except:
+        elif(gp_i == len(self.gps)):
+            #this is the second to last tab, display "All" animals
+            self.animals = Farm.instance().get_animals()
+        elif(gp_i == len(self.gps)+1):
+            #this is the last tab, add an animal "+"
+            self.animals = []
+        else:
             self.animals = []
 
         model = TableModel(self.animals)
         self.tables[gp_i].setModel(model)
         self.groups.setModel(ListModel(self.gps))
         self.groups.setCurrentIndex(-1)
+
+    def set_table(self):
+        t_view = QTableView()
+        t_view.resize(500, 300)
+        t_view.horizontalHeader().setStretchLastSection(True)
+        t_view.setAlternatingRowColors(True)
+        t_view.setSelectionBehavior(QTableView.SelectRows)
+        self.tables.append(t_view)
+        return t_view
 
     def add_anim(self):
         i = self.groups.currentIndex()
@@ -91,4 +109,32 @@ class AnimalWidget(QWidget):
         self.date_added.setDateTime(QDateTime.currentDateTime())
         #model = TableModel(self.animals)
         #self.farmview.setModel(model)
+
+    def add_group_form(self):
+        self.gp_name = QLineEdit()
+        self.layout.addRow(QLabel("Group Name"), self.gp_name)
+        self.gp_button = QPushButton("Add")
+        self.gp_button.setGeometry(QRect(20, 15, 43, 18))
+        self.layout.addRow(self.gp_button)
+        self.gp_button.clicked.connect(self.add_gp)
+
+    def add_gp(self):
+        try:
+            self.farm = Farm.instance().add_group(self.gp_name.text())
+        except:
+            raise Exception("Could not modify groups.")
+
+        self.gp_name.setText("")
+        model = TableModel(self.farm)
+        self.farmview.setModel(model)
+
+class AddGroupDialog(QInputDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Please create a farm")
+        self.setCancelButtonText("Exit Farm Tool")
+        self.setOkButtonText("Create Farm")
+        self.setLabelText("Please enter the name of your farm: ")
+        self.setTextValue("write farm name here")
 

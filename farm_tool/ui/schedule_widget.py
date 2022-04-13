@@ -72,9 +72,9 @@ class ScheduleWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.update_sched()
+        self.display()
 
-    def update_sched(self):
+    def display(self):
         try:
             self.schedules = Farm.instance().get_schedules()
         except:

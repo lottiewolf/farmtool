@@ -51,9 +51,9 @@ class ExpenseWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.update_expense()
+        self.display()
 
-    def update_expense(self):
+    def display(self):
         try:
             self.expenses = Farm.instance().get_expenses()
         except:

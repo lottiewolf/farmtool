@@ -73,9 +73,9 @@ class SupplyWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.update_supply()
+        self.display()
 
-    def update_supply(self):
+    def display(self):
         try:
             self.supplies = Farm.instance().get_supplies()
         except:
@@ -92,7 +92,7 @@ class SupplyWidget(QWidget):
                 self.price.value(),
                 self.purchase_qty.value(),
                 self.units.currentText(),
-                self.notes.text(),
+                self.notes.toPlainText(),
                 self.p_date.date().toPython(),
                 self.file,
             )

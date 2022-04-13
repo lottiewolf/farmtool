@@ -4,7 +4,6 @@ from PySide6.QtWidgets import (QMainWindow, QVBoxLayout, QTabWidget)
 from PySide6.QtCore import Qt
 from farm_tool.config.config_farm import ConfigFarm
 from farm_tool.ui.main_menu import MainMenu
-from farm_tool.ui.group_widget import GroupWidget
 from farm_tool.ui.animal_widget import AnimalWidget
 from farm_tool.ui.schedule_widget import ScheduleWidget
 from farm_tool.ui.supply_widget import SupplyWidget
@@ -42,9 +41,9 @@ class MainWindow(QMainWindow):
             else:
                 sys.exit()
 
-        self.update()
+        self.show_tabs()
 
-    def update(self):
+    def show_tabs(self):
         self.tabs = QTabWidget()
 
         self.mainLayout = QVBoxLayout()
@@ -58,21 +57,24 @@ class MainWindow(QMainWindow):
             self.helpWidget = HelpWidget(self)
             self.addDockWidget(Qt.RightDockWidgetArea, self.helpWidget)
 
-        self.gp_tab = GroupWidget()
         self.anim_tab = AnimalWidget()
         self.sched_tab = ScheduleWidget()
         self.supply_tab = SupplyWidget()
         self.expense_tab = ExpenseWidget()
         self.report_tab = ReportWidget()
 
-        self.tabs.addTab(self.gp_tab, "Groups")
         self.tabs.addTab(self.anim_tab, "Animals")
         self.tabs.addTab(self.sched_tab, "Schedules")
         self.tabs.addTab(self.supply_tab, "Supplies")
         self.tabs.addTab(self.expense_tab, "Expenses")
         self.tabs.addTab(self.report_tab, "Report")
+        self.tabs.setCurrentIndex(0)
+        self.tabs.currentChanged.connect(self.change_tab)
+        self.tabs.currentWidget().display()
 
         self.setWindowTitle(self.title_version + "  -  " +
                             str(self.settings.get_name()) + " Overview")
-        self.tabs.setCurrentIndex(0)
         self.show()
+
+    def change_tab(self):
+        self.tabs.currentWidget().display()

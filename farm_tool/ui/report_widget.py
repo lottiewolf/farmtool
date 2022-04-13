@@ -36,9 +36,9 @@ class ReportWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.show_gp_report(1)
+        self.display()
 
-    def show_gp_report(self, gp_id):
+    def display(self, gp_id=1):
         # first row, get list of animals
         #
         # next rows, get daily expenses per animal
