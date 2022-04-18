@@ -8,10 +8,11 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QPushButton,
 )
-from PySide6.QtCore import QRect
+from PySide6.QtCore import (QRect, Qt)
 from farm_tool.model.table_model import TableModel
 from farm_tool.controller.farm import Farm
 import pandas as pd
+import numpy as np
 
 
 class ReportWidget(QWidget):
@@ -20,36 +21,51 @@ class ReportWidget(QWidget):
 
         self.layout = QFormLayout()
 
-        self.farmview = QTableView()
-        self.farmview.resize(500, 300)
-        self.farmview.horizontalHeader().setStretchLastSection(True)
-        self.farmview.setAlternatingRowColors(True)
-        self.farmview.setSelectionBehavior(QTableView.SelectRows)
-        self.layout.addRow(self.farmview)
-
-        #self.gp_name = QLineEdit()
-        #self.layout.addRow(QLabel("Group Name"), self.gp_name)
-        #self.gp_button = QPushButton("Add")
-        #self.gp_button.setGeometry(QRect(20, 15, 43, 18))
-        #self.layout.addRow(self.gp_button)
-        #self.gp_button.clicked.connect(self.add_gp)
+        self.reportview = QTableView()
+        #self.reportview.setHorizontalHeader(QHeaderView)
+        #self.reportview.setVerticalHeader(QHeaderView)
+        self.reportview.resize(500, 300)
+        self.reportview.horizontalHeader().setStretchLastSection(True)
+        self.reportview.setAlternatingRowColors(True)
+        self.reportview.setSelectionBehavior(QTableView.SelectRows)
+        self.layout.addRow(self.reportview)
 
         self.setLayout(self.layout)
 
         self.display()
 
     def display(self, gp_id=1):
-        # first row, get list of animals
-        #
+
+        # Get animals of chosen group, get all supplies
+        self.animals = Farm.instance().get_animals(gp_id)
+        self.supplies = Farm.instance().get_supplies()
+
+        # Create dictionary of supplies
+        self.sup_dict = {}
+        for sup in self.supplies:
+            self.sup_dict[sup.id] = sup
+
+        # Create report table with 0 entries
+        self.report = np.zeros([len(self.supplies), len(self.animals)])
+
+        # Populate table with cost of each supply per schedule, per animal
+        for a in self.animals:
+            sched = Farm.instance().get_schedules(a.id)
+            for s in sched:
+                supply = self.sup_dict[s.supply_id]
+                cost_per_day = (supply.price/supply.purchase_qty)*s.qty * s.frequency
+                self.report[self.supplies.index(supply)][self.animals.index(a)] += cost_per_day
         # next rows, get daily expenses per animal
         #            multiply to get montly cost
         #            multiply to get yearly cost
         #
-        # in a grid, for each animal, for each supply, display cost
-        try:
-            self.farm = Farm.instance().get_animals(gp_id)
-        except:
-            self.farm = pd.DataFrame()
 
-        model = TableModel(self.farm)
-        self.farmview.setModel(model)
+        model = TableModel(self.report)
+
+        # Set headers
+        for a in self.animals:
+            model.setHeaderData(self.animals.index(a), Qt.Horizontal, a.name)
+        for s in self.supplies:
+            model.setHeaderData(self.supplies.index(s), Qt.Vertical, s.name)
+
+        self.reportview.setModel(model)

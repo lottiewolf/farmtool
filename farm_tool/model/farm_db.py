@@ -75,8 +75,9 @@ class FarmDB():
             with self.Session.begin() as session:
                 self.results = session.execute(statement).scalars().all()
         else:
-            #select all schedules where anim_id=anim_id
-            pass
+            statement = select(Schedule).where(Schedule.animal_id == anim_id)
+            with self.Session.begin() as session:
+                self.results = session.execute(statement).scalars().all()
         return self.results
 
     def add_group(self, new_name):
@@ -108,6 +109,14 @@ class FarmDB():
         with self.Session.begin() as session:
             session.add(sch)
         return self.get_schedules()
+
+    def edit(self, obj, col, value):
+        pk = obj.id
+        print("id: "+str(pk))
+        attr = obj[col]
+        print("column: "+str(attr))
+        print("new value: "+value)
+        return None
 
 #   ORM Querying
 #from sqlalchemy.orm import subqueryload
@@ -153,7 +162,7 @@ class Animal(Base):
 
     @classmethod
     def header(cls):
-        return ["name", "group_id", "date_added", "date_removed"]
+        return ["name", "date_added"]
 
     def __getitem__(self, idx):
         return getattr(self, self.header()[idx])

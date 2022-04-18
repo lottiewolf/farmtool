@@ -2,9 +2,12 @@
 
 from PySide6.QtWidgets import (
     QWidget,
+    QTreeView,
     QTabWidget,
+    QGroupBox,
     QVBoxLayout,
     QFormLayout,
+    QGridLayout,
     QLabel,
     QLineEdit,
     QComboBox,
@@ -24,39 +27,62 @@ class AnimalWidget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
-        # Set layout to vertical tabs, which displays groups' names
-        self.v_tabs = QTabWidget()
-        self.v_tabs.setTabPosition(QTabWidget.West)
+        # Create layout for all the widgets
         self.layout = QFormLayout()
-        self.layout.addWidget(self.v_tabs)
         self.setLayout(self.layout)
 
-        # Create form for Add Animal on layout
+        # Create vertical tabs, which will display groups' names
+        self.v_tabs = QTabWidget()
+        self.v_tabs.setTabPosition(QTabWidget.West)
+        self.layout.addWidget(self.v_tabs)
+
+        # Create form for Add Animal
+        self.a_form_layout = QGridLayout()
         self.name = QLineEdit()
         self.groups = QComboBox()
         self.date_added = QDateEdit(calendarPopup=True)
         self.date_added.setDateTime(QDateTime.currentDateTime())
-        self.layout.addRow(QLabel("Animal Name"), self.name)
-        self.layout.addRow(QLabel("Group Name"), self.groups)
-        self.layout.addRow(QLabel("Date Added"), self.date_added)
+        self.a_form_layout.addWidget(QLabel("Animal Name"), 0, 0)
+        self.a_form_layout.addWidget(self.name, 0, 1)
+        self.a_form_layout.addWidget(QLabel("Group Name"), 0, 2)
+        self.a_form_layout.addWidget(self.groups, 0, 3)
+        self.a_form_layout.addWidget(QLabel("Date Added"), 0, 4)
+        self.a_form_layout.addWidget(self.date_added, 0, 5)
         self.gp_button = QPushButton("Add")
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
-        self.layout.addRow(self.gp_button)
-        self.gp_button.clicked.connect(self.add_anim)
+        self.a_form_layout.addWidget(self.gp_button, 0, 6)
+        self.gp_button.clicked.connect(self.add_anim)       
+        self.a_form_box = QGroupBox("Add New Animal", self)
+        self.a_form_box.setLayout(self.a_form_layout)
+        self.layout.addWidget(self.a_form_box)
+
+        # Create form for Add Group
+        self.g_form_layout = QGridLayout()
+        self.gp_name = QLineEdit()
+        self.g_form_layout.addWidget(QLabel("Group Name"), 0, 0)
+        self.g_form_layout.addWidget(self.gp_name, 0, 1)
+        self.gp_button = QPushButton("Add")
+        self.gp_button.setGeometry(QRect(20, 15, 43, 18))
+        self.g_form_layout.addWidget(self.gp_button, 0, 2)
+        self.gp_button.clicked.connect(self.add_gp)
+        self.g_form_box = QGroupBox("Add New Group", self)
+        self.g_form_box.setLayout(self.g_form_layout)
+        self.layout.addWidget(self.g_form_box)
 
         # Get list of groups to add to tabs
         try:
             self.gps = Farm.instance().get_groups()
         except:
             self.gps = []
-        # if the list is empty, add the "Main Barn" group
+        if(len(self.gps)==0):
+            self.gps = Farm.instance().add_group("Main Barn")
+
         self.tables = []
         for g in self.gps:
             # Set table view, which will display animals (of a group)
             table = self.set_table()
             self.v_tabs.addTab(table, g.name)
         self.v_tabs.addTab(self.set_table(), "All")
-        self.v_tabs.addTab(self.set_table(), "+")
         self.v_tabs.setCurrentIndex(0)
         self.v_tabs.currentChanged.connect(self.change_tab)
         self.display(0)
@@ -69,11 +95,8 @@ class AnimalWidget(QWidget):
         if(gp_i < len(self.gps)):
             self.animals = Farm.instance().get_animals(gp_id=self.gps[gp_i].id)
         elif(gp_i == len(self.gps)):
-            #this is the second to last tab, display "All" animals
+            #this is the last tab, display "All" animals
             self.animals = Farm.instance().get_animals()
-        elif(gp_i == len(self.gps)+1):
-            #this is the last tab, add an animal "+"
-            self.animals = []
         else:
             self.animals = []
 
@@ -107,16 +130,6 @@ class AnimalWidget(QWidget):
         self.groups.setModel(ListModel(Farm.instance().get_groups()))
         self.groups.setCurrentIndex(-1)
         self.date_added.setDateTime(QDateTime.currentDateTime())
-        #model = TableModel(self.animals)
-        #self.farmview.setModel(model)
-
-    def add_group_form(self):
-        self.gp_name = QLineEdit()
-        self.layout.addRow(QLabel("Group Name"), self.gp_name)
-        self.gp_button = QPushButton("Add")
-        self.gp_button.setGeometry(QRect(20, 15, 43, 18))
-        self.layout.addRow(self.gp_button)
-        self.gp_button.clicked.connect(self.add_gp)
 
     def add_gp(self):
         try:
@@ -125,16 +138,3 @@ class AnimalWidget(QWidget):
             raise Exception("Could not modify groups.")
 
         self.gp_name.setText("")
-        model = TableModel(self.farm)
-        self.farmview.setModel(model)
-
-class AddGroupDialog(QInputDialog):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Please create a farm")
-        self.setCancelButtonText("Exit Farm Tool")
-        self.setOkButtonText("Create Farm")
-        self.setLabelText("Please enter the name of your farm: ")
-        self.setTextValue("write farm name here")
-

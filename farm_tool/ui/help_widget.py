@@ -7,6 +7,7 @@ class HelpWidget(QDockWidget):
     def __init__(self, main_window):
         QDockWidget.__init__(self, "Help Window", main_window)
 
+        # QHelpContentWidget
         helpTreeW = QTreeWidget()
         helpTreeW.setColumnCount(1)
         helpTreeW.setHeaderLabels(["Tabs"])

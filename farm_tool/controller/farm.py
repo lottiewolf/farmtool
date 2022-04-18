@@ -25,7 +25,6 @@ class Farm:
         return self.groups
 
     def get_supplies(self):
-        # This dropdown should be populated from a model, subclassed from QAbstractListModel.
         self.supplies = self.db.get_supplies()
         return self.supplies
 
@@ -37,8 +36,8 @@ class Farm:
         self.expenses = self.db.get_expenses()
         return self.expenses
 
-    def get_schedules(self):
-        self.schedules = self.db.get_schedules()
+    def get_schedules(self, a_id=-1):
+        self.schedules = self.db.get_schedules(a_id)
         return self.schedules
 
     def add_group(self, name):
@@ -61,3 +60,6 @@ class Farm:
         self.schedules = self.db.add_schedule(name, animal, supply, qty, fq, s_date, e_date)
         return self.schedules
 
+    def edit(self, obj, col, value):
+        self.new_obj = self.db.edit(obj, col, value)
+        return self.new_obj
