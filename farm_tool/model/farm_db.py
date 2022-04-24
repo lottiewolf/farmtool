@@ -6,7 +6,7 @@ Created on Tue Feb 22 11:23:05 2022
 @author: cwolf
 """
 
-from sqlalchemy import (create_engine, select)
+from sqlalchemy import (create_engine, select, inspect)
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy import (Sequence, Column, Integer, ForeignKey, String, DateTime, Date, Float)
 from farm_tool.config.config_farm import ConfigFarm
@@ -34,10 +34,12 @@ class FarmDB():
             settings = ConfigFarm.instance()
             self.engine = create_engine('sqlite:///'+str(settings.get_db_path()), echo=True)
             self.Session = sessionmaker(bind=self.engine, future=True, expire_on_commit=False)   # This session maker should go in an __init__ file, next version
+            #self.Session = Session(self.engine)
 
             Base.metadata.create_all(self.engine)
         except:
             raise Exception("Could not create db")
+        print("This is my sessionmaker result type: ",type(self.Session))
 
     def get_groups(self):
         statement = select(Group)
@@ -110,13 +112,12 @@ class FarmDB():
             session.add(sch)
         return self.get_schedules()
 
-    def edit(self, obj, col, value):
-        pk = obj.id
-        print("id: "+str(pk))
-        attr = obj[col]
-        print("column: "+str(attr))
-        print("new value: "+value)
-        return None
+    def flush(self, obj):
+        #session = inspect(obj).session
+        insp = inspect(obj)
+        print("state of db obj?: "+str(insp.detached))
+        #session.commit()
+
 
 #   ORM Querying
 #from sqlalchemy.orm import subqueryload
@@ -124,7 +125,15 @@ class FarmDB():
     #print(user, user.addresses)
     #eager loading of addresses, so it doesn't do n+1 sql queries
 
-class Group(Base):
+class Farm:
+    def __getitem__(self, idx):
+        return getattr(self, self.header()[idx])
+
+    def __setitem__(self, idx, value):
+        setattr(self, self.header()[idx], value)
+
+
+class Group(Base, Farm):
     __tablename__ = 'farm_groups'
 
     id = Column(Integer, primary_key=True)
@@ -140,11 +149,8 @@ class Group(Base):
     def header(cls):
         return ["name"]
 
-    def __getitem__(self, idx):
-        return getattr(self, self.header()[idx])
 
-
-class Animal(Base):
+class Animal(Base, Farm):
     __tablename__ = 'animal'
 
     id = Column(Integer, primary_key=True)
@@ -164,11 +170,8 @@ class Animal(Base):
     def header(cls):
         return ["name", "date_added"]
 
-    def __getitem__(self, idx):
-        return getattr(self, self.header()[idx])
 
-
-class Expense(Base):
+class Expense(Base, Farm):
     __tablename__ = 'expense'
 
     id = Column(Integer, primary_key=True)
@@ -189,11 +192,8 @@ class Expense(Base):
     def header(cls):
         return ["name", "amount", "group_id", "animal_id", "date"]
 
-    def __getitem__(self, idx):
-        return getattr(self, self.header()[idx])
 
-
-class Supply(Base):
+class Supply(Base, Farm):
     __tablename__ = 'supply'
 
     id = Column(Integer, primary_key=True)
@@ -214,11 +214,8 @@ class Supply(Base):
     def header(cls):
         return ["name", "price", "purchase_qty", "units", "notes", "date_purchased", "invoice"]
 
-    def __getitem__(self, idx):
-        return getattr(self, self.header()[idx])
 
-
-class Schedule(Base):
+class Schedule(Base, Farm):
     __tablename__ = 'schedule'
 
     id = Column(Integer, primary_key=True)
@@ -239,6 +236,3 @@ class Schedule(Base):
     @classmethod
     def header(cls):
         return ["name", "animal_id", "supply_id", "qty", "frequency"]
-
-    def __getitem__(self, idx):
-        return getattr(self, self.header()[idx])

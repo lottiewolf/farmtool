@@ -73,8 +73,6 @@ class SupplyWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.display()
-
     def display(self):
         try:
             self.supplies = Farm.instance().get_supplies()

@@ -72,8 +72,6 @@ class ScheduleWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.display()
-
     def display(self):
         try:
             self.schedules = Farm.instance().get_schedules()

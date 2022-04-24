@@ -85,7 +85,6 @@ class AnimalWidget(QWidget):
         self.v_tabs.addTab(self.set_table(), "All")
         self.v_tabs.setCurrentIndex(0)
         self.v_tabs.currentChanged.connect(self.change_tab)
-        self.display(0)
 
     def change_tab(self):
         self.display(self.v_tabs.currentIndex())

@@ -60,6 +60,5 @@ class Farm:
         self.schedules = self.db.add_schedule(name, animal, supply, qty, fq, s_date, e_date)
         return self.schedules
 
-    def edit(self, obj, col, value):
-        self.new_obj = self.db.edit(obj, col, value)
-        return self.new_obj
+    def flush(self, obj):
+        return self.db.flush(obj)

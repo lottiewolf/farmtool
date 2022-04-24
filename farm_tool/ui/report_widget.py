@@ -32,8 +32,6 @@ class ReportWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.display()
-
     def display(self, gp_id=1):
 
         # Get animals of chosen group, get all supplies
