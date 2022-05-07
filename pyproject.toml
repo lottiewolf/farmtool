@@ -1,6 +1,6 @@
 [project]
-name = "farm_tool"
-description = "farm_tool example package"
+name = "farmtool"
+description = "farmtool example package"
 version = "0.1"
 authors = [{name="Charlotte Wolf"}]
 dependencies = [
@@ -10,6 +10,6 @@ dependencies = [
 	"lxml",
 ]
 [tool.setuptools.packages.find]
-include = ["farm_tool*"]
+include = ["farmtool*"]
 [project.scripts]
-farm_tool = "farm_tool.main:run"
+farmtool = "farmtool.main:run"
