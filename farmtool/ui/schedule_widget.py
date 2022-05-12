@@ -13,9 +13,9 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import (QRect, QDateTime)
-from farm_tool.model.table_model import TableModel
-from farm_tool.model.list_model import ListModel
-from farm_tool.controller.farm import Farm
+from farmtool.model.table_model import TableModel
+from farmtool.model.list_model import ListModel
+from farmtool.controller.farm import Farm
 import pandas as pd
 
 
@@ -73,13 +73,14 @@ class ScheduleWidget(QWidget):
         self.setLayout(self.layout)
 
     def display(self):
-        try:
-            self.schedules = Farm.instance().get_schedules()
-        except:
-            self.schedules = pd.DataFrame()
-
+        self.schedules = Farm.instance().get_schedules()
+        
         model = TableModel(self.schedules)
         self.farmview.setModel(model)
+        self.name.setText("")
+        self.qty.setValue(0.0)
+        self.start_date.setDateTime(QDateTime.currentDateTime())
+        self.end_date.setDateTime(QDateTime.currentDateTime())
         self.animals.setModel(ListModel(Farm.instance().get_animals()))
         self.animals.setCurrentIndex(-1)
         self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
@@ -97,30 +98,16 @@ class ScheduleWidget(QWidget):
         a_i = self.animals.currentIndex()
         s_i = self.supplies.currentIndex()
         f_i = self.fq.currentIndex()
-        try:
-            self.schedules = Farm.instance().add_schedule(
-                self.name.text(),
-                self.animals.model().currentObj(a_i),
-                self.supplies.model().currentObj(s_i),
-                self.qty.value(),
-                self.fq.model().currentObj(f_i).value,
-                self.start_date.date().toPython(),
-                self.end_date.date().toPython(),
-            )
-        except:
-            raise Exception("Could not modify schedules.")
-
-        self.name.setText("")
-        self.animals.setModel(ListModel(Farm.instance().get_animals()))
-        self.animals.setCurrentIndex(-1)
-        self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
-        self.supplies.setCurrentIndex(-1)
-        self.qty.setValue(0.0)
-        self.fq.setCurrentIndex(-1)
-        self.start_date.setDateTime(QDateTime.currentDateTime())
-        self.end_date.setDateTime(QDateTime.currentDateTime())
-        model = TableModel(self.schedules)
-        self.farmview.setModel(model)
+        self.schedules = Farm.instance().add_schedule(
+            self.name.text(),
+            self.animals.model().currentObj(a_i),
+            self.supplies.model().currentObj(s_i),
+            self.qty.value(),
+            self.fq.model().currentObj(f_i).value,
+            self.start_date.date().toPython(),
+            self.end_date.date().toPython(),
+        )
+        self.display()
 
     def show_units(self):
         s = self.supplies.model().currentObj(self.supplies.currentIndex())

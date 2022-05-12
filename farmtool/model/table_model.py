@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide6.QtCore import (QAbstractTableModel, Qt, QModelIndex)
-from farm_tool.controller.farm import Farm
+from farmtool.controller.farm import Farm
 import pandas as pd
 
 
@@ -14,7 +14,8 @@ class TableModel(QAbstractTableModel):
             self._h_header = self._data[0].header()
         except:
             # for the report, where there is no table obj with .header()
-            self._h_header = [""]*len(self._data[0])
+            if(len(self._data) != 0):
+                self._h_header = [""]*len(self._data[0])
         self._v_header = [""]*len(self._data)
 
     def rowCount(self, parent=QModelIndex()) -> int:

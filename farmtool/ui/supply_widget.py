@@ -15,8 +15,8 @@ from PySide6.QtWidgets import (
     QTextEdit,
 )
 from PySide6.QtCore import (QRect, QDateTime)
-from farm_tool.model.table_model import TableModel
-from farm_tool.controller.farm import Farm
+from farmtool.model.table_model import TableModel
+from farmtool.controller.farm import Farm
 import pandas as pd
 
 
@@ -74,34 +74,26 @@ class SupplyWidget(QWidget):
         self.setLayout(self.layout)
 
     def display(self):
-        try:
-            self.supplies = Farm.instance().get_supplies()
-        except:
-            self.supplies = pd.DataFrame()
-
+        self.supplies = Farm.instance().get_supplies()
+        
         model = TableModel(self.supplies)
         self.farmview.setModel(model)
-
-    def add_supply(self):
-        try:
-            #also should pass an image of receipt
-            self.supplies = Farm.instance().add_supply(
-                self.supply_name.text(),
-                self.price.value(),
-                self.purchase_qty.value(),
-                self.units.currentText(),
-                self.notes.toPlainText(),
-                self.p_date.date().toPython(),
-                self.file,
-            )
-        except:
-            raise Exception("Could not modify supplies.")
-
         self.supply_name.setText("")
         self.price.setValue(0.0)
         self.purchase_qty.setValue(0.0)
         self.units.setCurrentIndex(0)
         self.notes.setText("")
         self.p_date.setDateTime(QDateTime.currentDateTime())
-        model = TableModel(self.supplies)
-        self.farmview.setModel(model)
+
+    def add_supply(self):
+        #also should pass an image of receipt
+        self.supplies = Farm.instance().add_supply(
+            self.supply_name.text(),
+            self.price.value(),
+            self.purchase_qty.value(),
+            self.units.currentText(),
+            self.notes.toPlainText(),
+            self.p_date.date().toPython(),
+            self.file,
+        )
+        self.display()

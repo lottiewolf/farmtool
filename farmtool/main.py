@@ -1,8 +1,8 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide6.QtWidgets import (QApplication)
-from farm_tool.config.config_farm import ConfigFarm
-from farm_tool.ui.main_window import MainWindow
+from farmtool.config.config_farm import ConfigFarm
+from farmtool.ui.main_window import MainWindow
 import sys
 
 def run():

@@ -9,8 +9,8 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import (QRect, Qt)
-from farm_tool.model.table_model import TableModel
-from farm_tool.controller.farm import Farm
+from farmtool.model.table_model import TableModel
+from farmtool.controller.farm import Farm
 import pandas as pd
 import numpy as np
 

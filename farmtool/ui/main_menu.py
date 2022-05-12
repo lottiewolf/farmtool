@@ -10,10 +10,10 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Qt
-from farm_tool.ui.schedule_widget import ScheduleWidget
-from farm_tool.ui.expense_widget import ExpenseWidget
-from farm_tool.model.table_model import TableModel
-from farm_tool.controller.farm import Farm
+from farmtool.ui.schedule_widget import ScheduleWidget
+from farmtool.ui.expense_widget import ExpenseWidget
+from farmtool.model.table_model import TableModel
+from farmtool.controller.farm import Farm
 import pandas as pd
 import os, os.path
 import sys

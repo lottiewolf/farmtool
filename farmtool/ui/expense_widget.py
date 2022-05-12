@@ -12,9 +12,9 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import (QRect, QDateTime)
-from farm_tool.model.table_model import TableModel
-from farm_tool.model.list_model import ListModel
-from farm_tool.controller.farm import Farm
+from farmtool.model.table_model import TableModel
+from farmtool.model.list_model import ListModel
+from farmtool.controller.farm import Farm
 import pandas as pd
 
 
@@ -63,27 +63,18 @@ class ExpenseWidget(QWidget):
         self.groups.setCurrentIndex(-1)
         self.animals.setModel(ListModel(Farm.instance().get_animals()))
         self.animals.setCurrentIndex(-1)
+        self.name.setText("")
+        self.cost.setValue(0.0)
 
     def add_expense(self):
         g_i = self.groups.currentIndex()
         a_i = self.animals.currentIndex()
-        try:
-            self.expenses = Farm.instance().add_expense(
-                self.name.text(),
-                self.cost.value(),
-                self.groups.model().currentObj(g_i),
-                self.animals.model().currentObj(a_i),
-                self.date_added.date().toPython(),
-            )
-        except:
-            raise Exception("Could not modify expenses.")
-
-        self.name.setText("")
-        self.cost.setValue(0.0)
-        self.groups.setModel(ListModel(Farm.instance().get_groups()))
-        self.groups.setCurrentIndex(-1)
-        self.animals.setModel(ListModel(Farm.instance().get_animals()))
-        self.animals.setCurrentIndex(-1)
+        self.expenses = Farm.instance().add_expense(
+            self.name.text(),
+            self.cost.value(),
+            self.groups.model().currentObj(g_i),
+            self.animals.model().currentObj(a_i),
+            self.date_added.date().toPython(),
+        )
         self.date_added.setDateTime(QDateTime.currentDateTime())
-        model = TableModel(self.expenses)
-        self.farmview.setModel(model)
+        self.display()

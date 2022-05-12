@@ -17,9 +17,9 @@ from PySide6.QtWidgets import (
     QInputDialog,
 )
 from PySide6.QtCore import (QRect, QDateTime)
-from farm_tool.model.table_model import TableModel
-from farm_tool.model.list_model import ListModel
-from farm_tool.controller.farm import Farm
+from farmtool.model.table_model import TableModel
+from farmtool.model.list_model import ListModel
+from farmtool.controller.farm import Farm
 import pandas as pd
 
 
@@ -34,6 +34,8 @@ class AnimalWidget(QWidget):
         # Create vertical tabs, which will display groups' names
         self.v_tabs = QTabWidget()
         self.v_tabs.setTabPosition(QTabWidget.West)
+        self.v_tabs.setCurrentIndex(0)
+        self.v_tabs.currentChanged.connect(self.change_tab)
         self.layout.addWidget(self.v_tabs)
 
         # Create form for Add Animal
@@ -76,21 +78,22 @@ class AnimalWidget(QWidget):
             self.gps = []
         if(len(self.gps)==0):
             self.gps = Farm.instance().add_group("Main Barn")
-
+            
         self.tables = []
         for g in self.gps:
             # Set table view, which will display animals (of a group)
             table = self.set_table()
             self.v_tabs.addTab(table, g.name)
         self.v_tabs.addTab(self.set_table(), "All")
-        self.v_tabs.setCurrentIndex(0)
-        self.v_tabs.currentChanged.connect(self.change_tab)
+        self.display()
 
     def change_tab(self):
         self.display(self.v_tabs.currentIndex())
 
-    def display(self, gp_i=0):
+    def display(self, gp_i=0):        
+        self.v_tabs.setCurrentIndex(gp_i)       
         # if gp_i is in the range of gps, then get the animals in that group
+        print("Group list:"+str(len(self.gps)))
         if(gp_i < len(self.gps)):
             self.animals = Farm.instance().get_animals(gp_id=self.gps[gp_i].id)
         elif(gp_i == len(self.gps)):
@@ -129,11 +132,10 @@ class AnimalWidget(QWidget):
         self.groups.setModel(ListModel(Farm.instance().get_groups()))
         self.groups.setCurrentIndex(-1)
         self.date_added.setDateTime(QDateTime.currentDateTime())
+        self.display(i)
 
     def add_gp(self):
-        try:
-            self.farm = Farm.instance().add_group(self.gp_name.text())
-        except:
-            raise Exception("Could not modify groups.")
-
+        self.gps = Farm.instance().add_group(self.gp_name.text())
+        self.v_tabs.insertTab(len(self.gps)-1, self.set_table(), self.gp_name.text())
         self.gp_name.setText("")
+        self.display(len(self.gps)-1)

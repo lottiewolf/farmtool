@@ -2,15 +2,15 @@
 
 from PySide6.QtWidgets import (QMainWindow, QVBoxLayout, QTabWidget)
 from PySide6.QtCore import Qt
-from farm_tool.config.config_farm import ConfigFarm
-from farm_tool.ui.main_menu import MainMenu
-from farm_tool.ui.animal_widget import AnimalWidget
-from farm_tool.ui.schedule_widget import ScheduleWidget
-from farm_tool.ui.supply_widget import SupplyWidget
-from farm_tool.ui.expense_widget import ExpenseWidget
-from farm_tool.ui.report_widget import ReportWidget
-from farm_tool.ui.help_widget import HelpWidget
-from farm_tool.ui.create_farm_dialog import CreateFarmDialog
+from farmtool.config.config_farm import ConfigFarm
+from farmtool.ui.main_menu import MainMenu
+from farmtool.ui.animal_widget import AnimalWidget
+from farmtool.ui.schedule_widget import ScheduleWidget
+from farmtool.ui.supply_widget import SupplyWidget
+from farmtool.ui.expense_widget import ExpenseWidget
+from farmtool.ui.report_widget import ReportWidget
+from farmtool.ui.help_widget import HelpWidget
+from farmtool.ui.create_farm_dialog import CreateFarmDialog
 import sys
 
 
