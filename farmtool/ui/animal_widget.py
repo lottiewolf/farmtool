@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import (QRect, QDateTime)
 from farmtool.model.table_model import TableModel
 from farmtool.model.list_model import ListModel
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 
 
@@ -39,11 +39,11 @@ class AnimalWidget(QWidget):
         
         # Get list of groups to add to tabs
         try:
-            self.gps = Farm.instance().get_groups()
+            self.gps = FarmDB.instance().get_groups()
         except:
             self.gps = []
         if(len(self.gps)==0):
-            self.gps = Farm.instance().add_group("Main Barn")
+            self.gps = FarmDB.instance().add_group("Main Barn")
         
         self.tables = []
         for g in self.gps:
@@ -96,10 +96,10 @@ class AnimalWidget(QWidget):
         # if index is in the range of gps, then get the animals in that group
         print("The length of tables is:"+str(len(self.tables))+"the index is:"+str(index))
         if(index < len(self.tables)-1):
-            self.animals = Farm.instance().get_animals(gp_id=self.gps[index].id)
+            self.animals = FarmDB.instance().get_animals(gp_id=self.gps[index].id)
         elif(index == len(self.tables)-1):
             #this is the last tab, display "All" animals
-            self.animals = Farm.instance().get_animals()
+            self.animals = FarmDB.instance().get_animals()
         else:
             self.animals = []
 
@@ -119,7 +119,7 @@ class AnimalWidget(QWidget):
     def add_anim(self):
         i = self.groups.currentIndex()
         try:
-            self.animals = Farm.instance().add_animal(
+            self.animals = FarmDB.instance().add_animal(
                 self.name.text(),
                 self.groups.model().currentObj(i),
                 self.date_added.date().toPython(),
@@ -135,7 +135,7 @@ class AnimalWidget(QWidget):
         self.display(i)
 
     def add_gp(self):
-        self.gps = Farm.instance().add_group(self.gp_name.text())
+        self.gps = FarmDB.instance().add_group(self.gp_name.text())
         new_table = self.set_table()
         self.v_tabs.insertTab(len(self.gps)-1, new_table, self.gp_name.text())
         self.tables.insert(-2, new_table)

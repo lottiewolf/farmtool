@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import (QRect, QDateTime)
 from farmtool.model.table_model import TableModel
 from farmtool.model.list_model import ListModel
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 
 
@@ -53,15 +53,15 @@ class ExpenseWidget(QWidget):
 
     def display(self):
         try:
-            self.expenses = Farm.instance().get_expenses()
+            self.expenses = FarmDB.instance().get_expenses()
         except:
             self.expenses = pd.DataFrame()
 
         model = TableModel(self.expenses)
         self.farmview.setModel(model)
-        self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.groups.setModel(ListModel(FarmDB.instance().get_groups()))
         self.groups.setCurrentIndex(-1)
-        self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.animals.setModel(ListModel(FarmDB.instance().get_animals()))
         self.animals.setCurrentIndex(-1)
         self.name.setText("")
         self.cost.setValue(0.0)
@@ -69,7 +69,7 @@ class ExpenseWidget(QWidget):
     def add_expense(self):
         g_i = self.groups.currentIndex()
         a_i = self.animals.currentIndex()
-        self.expenses = Farm.instance().add_expense(
+        self.expenses = FarmDB.instance().add_expense(
             self.name.text(),
             self.cost.value(),
             self.groups.model().currentObj(g_i),

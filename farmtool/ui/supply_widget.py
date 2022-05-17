@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import (QRect, QDateTime)
 from farmtool.model.table_model import TableModel
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 
 
@@ -74,7 +74,7 @@ class SupplyWidget(QWidget):
         self.setLayout(self.layout)
 
     def display(self):
-        self.supplies = Farm.instance().get_supplies()
+        self.supplies = FarmDB.instance().get_supplies()
         
         model = TableModel(self.supplies)
         self.farmview.setModel(model)
@@ -87,7 +87,7 @@ class SupplyWidget(QWidget):
 
     def add_supply(self):
         #also should pass an image of receipt
-        self.supplies = Farm.instance().add_supply(
+        self.supplies = FarmDB.instance().add_supply(
             self.supply_name.text(),
             self.price.value(),
             self.purchase_qty.value(),

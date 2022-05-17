@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import (QRect, QDateTime)
 from farmtool.model.table_model import TableModel
 from farmtool.model.list_model import ListModel
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 
 
@@ -73,7 +73,7 @@ class ScheduleWidget(QWidget):
         self.setLayout(self.layout)
 
     def display(self):
-        self.schedules = Farm.instance().get_schedules()
+        self.schedules = FarmDB.instance().get_schedules()
         
         model = TableModel(self.schedules)
         self.farmview.setModel(model)
@@ -81,9 +81,9 @@ class ScheduleWidget(QWidget):
         self.qty.setValue(0.0)
         self.start_date.setDateTime(QDateTime.currentDateTime())
         self.end_date.setDateTime(QDateTime.currentDateTime())
-        self.animals.setModel(ListModel(Farm.instance().get_animals()))
+        self.animals.setModel(ListModel(FarmDB.instance().get_animals()))
         self.animals.setCurrentIndex(-1)
-        self.supplies.setModel(ListModel(Farm.instance().get_supplies()))
+        self.supplies.setModel(ListModel(FarmDB.instance().get_supplies()))
         self.supplies.setCurrentIndex(-1)
         self.fq.setModel(ListModel([DropDownObj("daily",1),
                                     DropDownObj("biweekly", 2/7),
@@ -98,7 +98,7 @@ class ScheduleWidget(QWidget):
         a_i = self.animals.currentIndex()
         s_i = self.supplies.currentIndex()
         f_i = self.fq.currentIndex()
-        self.schedules = Farm.instance().add_schedule(
+        self.schedules = FarmDB.instance().add_schedule(
             self.name.text(),
             self.animals.model().currentObj(a_i),
             self.supplies.model().currentObj(s_i),

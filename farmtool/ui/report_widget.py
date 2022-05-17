@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import (QRect, Qt)
 from farmtool.model.table_model import TableModel
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 import numpy as np
 
@@ -35,8 +35,8 @@ class ReportWidget(QWidget):
     def display(self, gp_id=1):
 
         # Get animals of chosen group, get all supplies
-        self.animals = Farm.instance().get_animals(gp_id)
-        self.supplies = Farm.instance().get_supplies()
+        self.animals = FarmDB.instance().get_animals(gp_id)
+        self.supplies = FarmDB.instance().get_supplies()
 
         # Create dictionary of supplies
         self.sup_dict = {}
@@ -48,7 +48,7 @@ class ReportWidget(QWidget):
 
         # Populate table with cost of each supply per schedule, per animal
         for a in self.animals:
-            sched = Farm.instance().get_schedules(a.id)
+            sched = FarmDB.instance().get_schedules(a.id)
             for s in sched:
                 supply = self.sup_dict[s.supply_id]
                 cost_per_day = (supply.price/supply.purchase_qty)*s.qty * s.frequency

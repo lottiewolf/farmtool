@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide6.QtCore import (QAbstractTableModel, Qt, QModelIndex)
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 
 
@@ -46,7 +46,7 @@ class TableModel(QAbstractTableModel):
     def setData(self, index, value, role):
             if role == Qt.EditRole:
                 self._data[index.row()][index.column()] = value
-                Farm.instance().flush(self._data[index.row()])
+                FarmDB.instance().flush(self._data[index.row()])
                 return True
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):
