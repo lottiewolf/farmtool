@@ -34,9 +34,26 @@ class AnimalWidget(QWidget):
         # Create vertical tabs, which will display groups' names
         self.v_tabs = QTabWidget()
         self.v_tabs.setTabPosition(QTabWidget.West)
-        self.v_tabs.setCurrentIndex(0)
         self.v_tabs.currentChanged.connect(self.change_tab)
         self.layout.addWidget(self.v_tabs)
+        
+        # Get list of groups to add to tabs
+        try:
+            self.gps = Farm.instance().get_groups()
+        except:
+            self.gps = []
+        if(len(self.gps)==0):
+            self.gps = Farm.instance().add_group("Main Barn")
+        
+        self.tables = []
+        for g in self.gps:
+            # Set table view, which will display animals (of a group)
+            table = self.set_table()
+            self.tables.append(table)
+            self.v_tabs.addTab(table, g.name)
+        all_table = self.set_table()
+        self.v_tabs.addTab(all_table, "All")
+        self.tables.append(all_table)
 
         # Create form for Add Animal
         self.a_form_layout = QGridLayout()
@@ -71,39 +88,23 @@ class AnimalWidget(QWidget):
         self.g_form_box.setLayout(self.g_form_layout)
         self.layout.addWidget(self.g_form_box)
 
-        # Get list of groups to add to tabs
-        try:
-            self.gps = Farm.instance().get_groups()
-        except:
-            self.gps = []
-        if(len(self.gps)==0):
-            self.gps = Farm.instance().add_group("Main Barn")
-            
-        self.tables = []
-        for g in self.gps:
-            # Set table view, which will display animals (of a group)
-            table = self.set_table()
-            self.v_tabs.addTab(table, g.name)
-        self.v_tabs.addTab(self.set_table(), "All")
-        self.display()
-
     def change_tab(self):
         self.display(self.v_tabs.currentIndex())
-
-    def display(self, gp_i=0):        
-        self.v_tabs.setCurrentIndex(gp_i)       
-        # if gp_i is in the range of gps, then get the animals in that group
-        print("Group list:"+str(len(self.gps)))
-        if(gp_i < len(self.gps)):
-            self.animals = Farm.instance().get_animals(gp_id=self.gps[gp_i].id)
-        elif(gp_i == len(self.gps)):
+        
+    def display(self, index=0):
+        self.v_tabs.setCurrentIndex(index)       
+        # if index is in the range of gps, then get the animals in that group
+        print("The length of tables is:"+str(len(self.tables))+"the index is:"+str(index))
+        if(index < len(self.tables)-1):
+            self.animals = Farm.instance().get_animals(gp_id=self.gps[index].id)
+        elif(index == len(self.tables)-1):
             #this is the last tab, display "All" animals
             self.animals = Farm.instance().get_animals()
         else:
             self.animals = []
 
         model = TableModel(self.animals)
-        self.tables[gp_i].setModel(model)
+        self.tables[index].setModel(model)
         self.groups.setModel(ListModel(self.gps))
         self.groups.setCurrentIndex(-1)
 
@@ -113,7 +114,6 @@ class AnimalWidget(QWidget):
         t_view.horizontalHeader().setStretchLastSection(True)
         t_view.setAlternatingRowColors(True)
         t_view.setSelectionBehavior(QTableView.SelectRows)
-        self.tables.append(t_view)
         return t_view
 
     def add_anim(self):
@@ -136,6 +136,8 @@ class AnimalWidget(QWidget):
 
     def add_gp(self):
         self.gps = Farm.instance().add_group(self.gp_name.text())
-        self.v_tabs.insertTab(len(self.gps)-1, self.set_table(), self.gp_name.text())
+        new_table = self.set_table()
+        self.v_tabs.insertTab(len(self.gps)-1, new_table, self.gp_name.text())
+        self.tables.insert(-2, new_table)
         self.gp_name.setText("")
         self.display(len(self.gps)-1)
