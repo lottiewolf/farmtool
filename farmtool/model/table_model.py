@@ -46,7 +46,7 @@ class TableModel(QAbstractTableModel):
     def setData(self, index, value, role):
             if role == Qt.EditRole:
                 self._data[index.row()][index.column()] = value
-                FarmDB.instance().flush(self._data[index.row()])
+                FarmDB.instance().commit(self._data[index.row()])
                 return True
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole):

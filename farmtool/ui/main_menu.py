@@ -13,7 +13,7 @@ from PySide6.QtCore import Qt
 from farmtool.ui.schedule_widget import ScheduleWidget
 from farmtool.ui.expense_widget import ExpenseWidget
 from farmtool.model.table_model import TableModel
-from farmtool.controller.farm import Farm
+from farmtool.model.farm_db import FarmDB
 import pandas as pd
 import os, os.path
 import sys
@@ -61,7 +61,7 @@ class MainMenu(QMenuBar):
     def i_data(self):
         self.gp_dlg = CreateGroupDialog()
         if self.gp_dlg.exec():
-            Farm.instance().add_group(self.gp_dlg.textValue())
+            FarmDB.instance().add_group(self.gp_dlg.textValue())
 
         #self.g_widget = GroupWidget()
         #self.mainLayout = QVBoxLayout()
@@ -72,7 +72,7 @@ class MainMenu(QMenuBar):
     def e_data(self):
         self.gp_dlg = CreateGroupDialog()
         if self.gp_dlg.exec():
-            Farm.instance().add_group(self.gp_dlg.textValue())
+            FarmDB.instance().add_group(self.gp_dlg.textValue())
 
         self.s_widget = ScheduleWidget(self.main_win)
         self.mainLayout = QVBoxLayout()
@@ -88,7 +88,7 @@ class MainMenu(QMenuBar):
 
     def rep_list(self):
         self.main_win.layout = QFormLayout()
-        model = TableModel(Farm.instance().get_expenses())
+        model = TableModel(FarmDB.instance().get_expenses())
 
         farmview = QTableView()
         farmview.resize(500, 300)

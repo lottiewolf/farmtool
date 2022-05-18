@@ -52,8 +52,8 @@ class AnimalWidget(QWidget):
             self.tables.append(table)
             self.v_tabs.addTab(table, g.name)
         all_table = self.set_table()
-        self.v_tabs.addTab(all_table, "All")
         self.tables.append(all_table)
+        self.v_tabs.addTab(all_table, "All")
 
         # Create form for Add Animal
         self.a_form_layout = QGridLayout()
