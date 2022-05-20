@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         self.statusBar()
 
         self.tabs = QTabWidget()
-
+        
         self.mainLayout = QVBoxLayout()
         self.mainLayout.addWidget(self.tabs)
         self.setLayout(self.mainLayout)

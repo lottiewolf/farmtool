@@ -33,8 +33,7 @@ class AnimalWidget(QWidget):
 
         # Create vertical tabs, which will display groups' names
         self.v_tabs = QTabWidget()
-        self.v_tabs.setTabPosition(QTabWidget.West)
-        self.v_tabs.currentChanged.connect(self.change_tab)
+        
         self.layout.addWidget(self.v_tabs)
         
         # Get list of groups to add to tabs
@@ -45,6 +44,7 @@ class AnimalWidget(QWidget):
         if(len(self.gps)==0):
             self.gps = FarmDB.instance().add_group("Main Barn")
         
+        print("Here are the groups:"+str(self.gps))
         self.tables = []
         for g in self.gps:
             # Set table view, which will display animals (of a group)
@@ -87,6 +87,9 @@ class AnimalWidget(QWidget):
         self.g_form_box = QGroupBox("Add New Group", self)
         self.g_form_box.setLayout(self.g_form_layout)
         self.layout.addWidget(self.g_form_box)
+        
+        self.v_tabs.setTabPosition(QTabWidget.West)
+        self.v_tabs.currentChanged.connect(self.change_tab)
 
     def change_tab(self):
         self.display(self.v_tabs.currentIndex())
@@ -94,7 +97,6 @@ class AnimalWidget(QWidget):
     def display(self, index=0):
         self.v_tabs.setCurrentIndex(index)       
         # if index is in the range of gps, then get the animals in that group
-        print("The length of tables is:"+str(len(self.tables))+"the index is:"+str(index))
         if(index < len(self.tables)-1):
             self.animals = FarmDB.instance().get_animals(gp_id=self.gps[index].id)
         elif(index == len(self.tables)-1):
@@ -103,7 +105,8 @@ class AnimalWidget(QWidget):
         else:
             self.animals = []
 
-        model = TableModel(self.animals)
+        hdr = ["Name", "Group", "Date Added", "Date Removed"]
+        model = TableModel(self.animals, header=hdr)
         self.tables[index].setModel(model)
         self.groups.setModel(ListModel(self.gps))
         self.groups.setCurrentIndex(-1)
@@ -129,7 +132,7 @@ class AnimalWidget(QWidget):
             raise Exception("Could not modify animals.")
 
         self.name.setText("")
-        self.groups.setModel(ListModel(Farm.instance().get_groups()))
+        self.groups.setModel(ListModel(self.gps))
         self.groups.setCurrentIndex(-1)
         self.date_added.setDateTime(QDateTime.currentDateTime())
         self.display(i)

@@ -7,11 +7,11 @@ import pandas as pd
 
 class TableModel(QAbstractTableModel):
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data, header=None, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self._data = data
         try:
-            self._h_header = self._data[0].header()
+            self._h_header = header
         except:
             # for the report, where there is no table obj with .header()
             if(len(self._data) != 0):

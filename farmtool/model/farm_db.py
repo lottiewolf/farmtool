@@ -34,31 +34,78 @@ class FarmDB():
             settings = ConfigFarm.instance()
             self.engine = create_engine('sqlite:///'+str(settings.get_db_path()), echo=True)
             self.session = Session(self.engine)
-
+            
             Base.metadata.create_all(self.engine)
         except:
             raise Exception("Could not create db")
 
     def get_groups(self):
-        statement = select(Group)
-        return self.session.execute(statement).scalars().all()
+        statement = (
+            select(
+                Group.id,
+                Group.name, 
+            )
+        )
+        return self.session.execute(statement).all()
 
     def get_supplies(self):
-        statement = select(Supply)
-        return self.session.execute(statement).scalars().all()
+        statement = (
+            select(
+                Supply.name,
+                Supply.price,
+                Supply.purchase_qty,
+                Supply.units,
+                Supply.notes,
+                Supply.date_purchased,
+                Supply.invoice,  
+            )
+            .order_by(Supply.date_purchased)
+        )
+        return self.session.execute(statement).all()
 
     def get_animals(self, gp_id=-1):
         if(gp_id==-1):
-            statement = select(Animal)
-            self.results = self.session.execute(statement).scalars().all()
+            statement = (
+                select(
+                    Animal.name,
+                    Group.name,
+                    Animal.date_added,
+                    Animal.date_removed,
+                )
+                .join(Group)
+                .order_by(Animal.date_added)
+            )
+            self.results = self.session.execute(statement).all()
         else:
-            statement = select(Animal).where(Animal.group_id == gp_id)
-            self.results = self.session.execute(statement).scalars().all()
+            statement = (
+                select(
+                    Animal.name,
+                    Group.name,
+                    Animal.date_added,
+                    Animal.date_removed, 
+                )
+                .join(Group)
+                .where(Animal.group_id == gp_id)
+                .order_by(Animal.date_added)
+            )
+            self.results = self.session.execute(statement).all()
         return self.results
 
     def get_expenses(self, gp_id=-1, anim_id=-1):
-        statement = select(Expense)
-        return self.session.execute(statement).scalars().all()
+        statement = (
+            select(
+                Expense.name.label("expensename"),
+                Expense.amount,
+                Group.name.label("groupname"),
+                Animal.name,
+                Expense.date,
+            )
+            .join(Expense.group)
+            .join(Expense.animal)
+            .order_by(Expense.date)
+        )
+        print(str(statement))
+        return self.session.execute(statement).all()
 
     def get_schedules(self, anim_id=-1):
         if(anim_id==-1):

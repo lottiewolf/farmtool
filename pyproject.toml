@@ -13,3 +13,5 @@ dependencies = [
 include = ["farmtool*"]
 [project.scripts]
 farmtool = "farmtool.main:run"
+[build-system]
+requires = ["setuptools"]

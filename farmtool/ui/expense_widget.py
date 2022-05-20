@@ -52,12 +52,10 @@ class ExpenseWidget(QWidget):
         self.setLayout(self.layout)
 
     def display(self):
-        try:
-            self.expenses = FarmDB.instance().get_expenses()
-        except:
-            self.expenses = pd.DataFrame()
-
-        model = TableModel(self.expenses)
+        self.expenses = FarmDB.instance().get_expenses()
+        
+        hdr = ["Name","Cost","Group", "Animal", "Date"]
+        model = TableModel(self.expenses, header=hdr)
         self.farmview.setModel(model)
         self.groups.setModel(ListModel(FarmDB.instance().get_groups()))
         self.groups.setCurrentIndex(-1)
