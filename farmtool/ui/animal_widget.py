@@ -105,7 +105,7 @@ class AnimalWidget(QWidget):
         else:
             self.animals = []
 
-        hdr = ["Name", "Group", "Date Added", "Date Removed"]
+        hdr = ["ID", "Name", "Group", "Date Added", "Date Removed"]
         model = TableModel(self.animals, header=hdr)
         self.tables[index].setModel(model)
         self.groups.setModel(ListModel(self.gps))

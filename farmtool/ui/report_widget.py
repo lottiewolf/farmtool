@@ -8,10 +8,9 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QPushButton,
 )
-from PySide6.QtCore import (QRect, Qt)
+from PySide6.QtCore import Qt
 from farmtool.model.table_model import TableModel
 from farmtool.model.farm_db import FarmDB
-import pandas as pd
 import numpy as np
 
 
@@ -44,21 +43,27 @@ class ReportWidget(QWidget):
             self.sup_dict[sup.id] = sup
 
         # Create report table with 0 entries
-        self.report = np.zeros([len(self.supplies), len(self.animals)])
+        self.report = np.zeros([len(self.supplies), len(self.animals)*2])
 
         # Populate table with cost of each supply per schedule, per animal
+        hdr = []
         for a in self.animals:
+            print("Here is a row of the animal results:"+str(a))
+            hdr.append(a.name)
             sched = FarmDB.instance().get_schedules(a.id)
             for s in sched:
                 supply = self.sup_dict[s.supply_id]
-                cost_per_day = (supply.price/supply.purchase_qty)*s.qty * s.frequency
+                if (supply.purchase_qty != 0):
+                    cost_per_day = (supply.price/supply.purchase_qty)*s.qty * s.frequency
+                else:
+                    cost_per_day = 0
                 self.report[self.supplies.index(supply)][self.animals.index(a)] += cost_per_day
         # next rows, get daily expenses per animal
         #            multiply to get montly cost
         #            multiply to get yearly cost
         #
-
-        model = TableModel(self.report)
+        
+        model = TableModel(self.report, header=hdr)
 
         # Set headers
         for a in self.animals:

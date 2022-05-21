@@ -1,0 +1,20 @@
+from new fedora install
+-----------------------------------------------
+sudo dnf install wine gh
+pip install pyinstaller
+
+gh repo clone lottiewolf/farmtool
+gh auth login
+(follow prompts)
+cd farmtool
+pip install .
+farmtool
+
+running farmtool in linux
+---------------------------
+pip install .
+farmtool
+
+running farmtool in wine for windows
+-------------------------------------
+

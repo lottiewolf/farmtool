@@ -76,7 +76,7 @@ class SupplyWidget(QWidget):
     def display(self):
         self.supplies = FarmDB.instance().get_supplies()
         
-        hdr = ["Name","Price","Qty", "Units", "Notes", "Date", "Invoice"]
+        hdr = ["Id", "Name","Price","Qty", "Units", "Notes", "Date", "Invoice"]
         model = TableModel(self.supplies, header=hdr)
         self.farmview.setModel(model)
         self.supply_name.setText("")

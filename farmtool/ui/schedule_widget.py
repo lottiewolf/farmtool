@@ -16,7 +16,6 @@ from PySide6.QtCore import (QRect, QDateTime)
 from farmtool.model.table_model import TableModel
 from farmtool.model.list_model import ListModel
 from farmtool.model.farm_db import FarmDB
-import pandas as pd
 
 
 class ScheduleWidget(QWidget):
@@ -75,7 +74,8 @@ class ScheduleWidget(QWidget):
     def display(self):
         self.schedules = FarmDB.instance().get_schedules()
         
-        model = TableModel(self.schedules)
+        hdr = ["Name","Animal","Supply", "Qty", "Frequency", "Start", "End"]
+        model = TableModel(self.schedules, header=hdr)
         self.farmview.setModel(model)
         self.name.setText("")
         self.qty.setValue(0.0)

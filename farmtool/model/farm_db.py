@@ -10,7 +10,6 @@ from sqlalchemy import (create_engine, select)
 from sqlalchemy.orm import (declarative_base, relationship, Session)
 from sqlalchemy import (Sequence, Column, Integer, ForeignKey, String, DateTime, Date, Float)
 from farmtool.config.config_farm import ConfigFarm
-import pandas as pd
 
 Base = declarative_base()
 
@@ -51,6 +50,7 @@ class FarmDB():
     def get_supplies(self):
         statement = (
             select(
+                Supply.id,
                 Supply.name,
                 Supply.price,
                 Supply.purchase_qty,
@@ -67,6 +67,7 @@ class FarmDB():
         if(gp_id==-1):
             statement = (
                 select(
+                    Animal.id,
                     Animal.name,
                     Group.name,
                     Animal.date_added,
@@ -79,6 +80,7 @@ class FarmDB():
         else:
             statement = (
                 select(
+                    Animal.id,
                     Animal.name,
                     Group.name,
                     Animal.date_added,
@@ -104,16 +106,44 @@ class FarmDB():
             .join(Expense.animal)
             .order_by(Expense.date)
         )
-        print(str(statement))
         return self.session.execute(statement).all()
 
     def get_schedules(self, anim_id=-1):
         if(anim_id==-1):
-            statement = select(Schedule)
-            self.results = self.session.execute(statement).scalars().all()
+            statement = (
+                select(
+                    Schedule.name,
+                    Animal.name,
+                    Supply.name,
+                    Supply.id.label("supply_id"),
+                    Schedule.qty,
+                    Schedule.frequency,
+                    Schedule.date_started,
+                    Schedule.date_ended,
+                )
+                .join(Schedule.animal)
+                .join(Schedule.supply)
+                .order_by(Schedule.date_started)
+            )
+            self.results = self.session.execute(statement).all()
         else:
-            statement = select(Schedule).where(Schedule.animal_id == anim_id)
-            self.results = self.session.execute(statement).scalars().all()
+            statement = (
+                select(
+                    Schedule.name,
+                    Animal.name,
+                    Supply.name,
+                    Supply.id.label("supply_id"),
+                    Schedule.qty,
+                    Schedule.frequency,
+                    Schedule.date_started,
+                    Schedule.date_ended,
+                )
+                .where(Schedule.animal_id == anim_id)
+                .join(Schedule.animal)
+                .join(Schedule.supply)
+                .order_by(Schedule.date_started)
+            )
+            self.results = self.session.execute(statement).all()
         return self.results
 
     def add_group(self, new_name):
@@ -144,12 +174,6 @@ class FarmDB():
     def commit(self, obj):
         self.session.commit()
 
-
-#   ORM Querying
-#from sqlalchemy.orm import subqueryload
-#for user in session.query(User).options(subqueryload(User.addresses)):
-    #print(user, user.addresses)
-    #eager loading of addresses, so it doesn't do n+1 sql queries
 
 class Farm:
     def __getitem__(self, idx):
