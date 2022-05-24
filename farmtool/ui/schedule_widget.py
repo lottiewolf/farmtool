@@ -2,6 +2,9 @@
 
 from PySide6.QtWidgets import (
     QWidget,
+    QFrame,
+    QTextEdit,
+    QSplitter,
     QFormLayout,
     QGridLayout,
     QTableView,
@@ -12,7 +15,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
 )
-from PySide6.QtCore import (QRect, QDateTime)
+from PySide6.QtCore import (Qt, QRect, QDateTime)
 from farmtool.model.table_model import TableModel
 from farmtool.model.list_model import ListModel
 from farmtool.model.farm_db import FarmDB
@@ -22,17 +25,26 @@ class ScheduleWidget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
+        # This section lays out the three splitter windows        
         self.layout = QFormLayout()
-
+        splitter_top = QSplitter(Qt.Horizontal)
+        splitter_wholepage = QSplitter(Qt.Vertical)
+        splitter_wholepage.addWidget(splitter_top)
+        self.layout.addRow(splitter_wholepage)
+        
         # This section sets the top view, displays all the schedules in a table
-        self.farmview = QTableView()
-        self.farmview.resize(500, 300)
-        self.farmview.horizontalHeader().setStretchLastSection(True)
-        self.farmview.setAlternatingRowColors(True)
-        self.farmview.setSelectionBehavior(QTableView.SelectRows)
-        self.layout.addRow(self.farmview)
-
+        self.schedview = QTableView()
+        self.schedview.resize(500, 300)
+        self.schedview.horizontalHeader().setStretchLastSection(True)
+        self.schedview.setAlternatingRowColors(True)
+        self.schedview.setSelectionBehavior(QTableView.SelectRows)
+        splitter_top.addWidget(self.schedview)
+        textedit = QTextEdit()
+        splitter_top.addWidget(textedit)
+        splitter_top.setSizes([100,200])   
+        
         # This section sets the bottom view, a form for adding a new schedule
+        self.bottom_widget = QFrame()
         self.add_layout = QGridLayout()
         self.name = QLineEdit()
         self.animals = QComboBox()
@@ -67,7 +79,8 @@ class ScheduleWidget(QWidget):
         self.gp_button.setGeometry(QRect(20, 15, 43, 18))
         self.add_layout.addWidget(self.gp_button, 4, 0)
         self.gp_button.clicked.connect(self.add_sched)
-        self.layout.addRow(self.add_layout)
+        self.bottom_widget.setLayout(self.add_layout)      
+        splitter_wholepage.addWidget(self.bottom_widget)
 
         self.setLayout(self.layout)
 
@@ -76,7 +89,7 @@ class ScheduleWidget(QWidget):
         
         hdr = ["Name","Animal","Supply", "Qty", "Frequency", "Start", "End"]
         model = TableModel(self.schedules, header=hdr)
-        self.farmview.setModel(model)
+        self.schedview.setModel(model)
         self.name.setText("")
         self.qty.setValue(0.0)
         self.start_date.setDateTime(QDateTime.currentDateTime())
